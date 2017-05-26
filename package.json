@@ -1,0 +1,30 @@
+{
+	"name": "discord-tt",
+	"description": "Music bot for discord rooms",
+	"repository": {
+		"type": "git"
+	},
+	"author": "Kate Wellington <sharedferret@gmail.com>",
+	"license": "MIT",
+	"readmeFilename": "README.md",
+	"main": "./app.js",
+	"engines": {
+		"node": ">=6.0.0"
+	},
+	"dependencies": {
+		"async": "*",
+		"discord.js": "~11.1.0",
+		"googleapis": "~2.1.7",
+		"lodash": "~4.3.0",
+		"moment": "*",
+		"moment-precise-range-plugin": "*",
+		"node-opus": "~0.2.4",
+		"node-schedule": "~1.0.0",
+		"node-uuid": "*",
+		"opusscript": "*",
+		"replaceall": "*",
+		"sqlite3": "*",
+		"ytdl-core": "*"
+	},
+	"version": "0.1.0"
+}

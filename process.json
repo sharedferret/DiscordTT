@@ -1,0 +1,7 @@
+{
+  "apps": [{
+    "name": "rubychan",
+    "script": "./app.js",
+    "watch": true
+  }]
+}

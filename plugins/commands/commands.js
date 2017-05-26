@@ -12,9 +12,14 @@ var handleMessage = function(bot, message) {
     embed.setAuthor(bot.user.username, bot.user.avatarURL);
     embed.setDescription('Here\'s a list of all the commands I support. For more info, type `/help [command name]`.');
     embed.addField('Supported Commands', 
-      messageHandler.commands.map(function(i) { 
-        return typeof i.name == 'string' ? i.name : i.name[0]; 
-      }).join('\n'));
+      messageHandler.commands
+        .filter(function(i) {
+          return i.hidden !== true;
+        })
+        .map(function(i) { 
+          return typeof i.name == 'string' ? i.name : i.name[0]; 
+        })
+        .join('\n'));
 
     embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
     embed.setTimestamp(new Date());

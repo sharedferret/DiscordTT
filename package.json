@@ -20,10 +20,10 @@
 		"moment-precise-range-plugin": "*",
 		"node-opus": "~0.2.4",
 		"node-schedule": "~1.0.0",
-		"node-uuid": "*",
 		"opusscript": "*",
 		"replaceall": "*",
 		"sqlite3": "*",
+		"uuid": "*",
 		"ytdl-core": "*"
 	},
 	"version": "0.1.0"

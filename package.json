@@ -22,6 +22,7 @@
 		"node-schedule": "~1.0.0",
 		"opusscript": "*",
 		"replaceall": "*",
+		"request": "*",
 		"sqlite3": "*",
 		"uuid": "*",
 		"ytdl-core": "*"

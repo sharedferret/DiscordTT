@@ -1,8 +1,9 @@
-var name = ['/play '];
-var description = 'Plays a song.';
-var usage = '`/play [YouTube ID]`: Plays a song with the given YouTube ID (the string after `https://youtube.com/watch?v=`). The bot will play the song in the voice channel you\'re connected to.';
+var name = ['/q add '];
+var description = 'Adds a song to your playlist.';
+var usage = '`/q add [song name or YouTube ID]`:';
 
 var messageHandler = require(global.paths.lib + 'message-handler');
+var queueHandler = require(global.paths.lib + 'queue-handler');
 var tt = require(global.paths.lib + 'turntable-handler');
 var google = require('googleapis');
 var youtube = google.youtube('v3');
@@ -14,11 +15,11 @@ var handleMessage = function(bot, message) {
   // TODO: This loop will act as the bot's main event loop when a DJ session is active
   // TODO: Optimize for bandwidth constraints (e.g. cache downloaded songs)
 
-  if (message.content.length < 6) {
+  if (message.content.length < 7) {
     return message.reply('no results found.');
   }
 
-  var searchParameters = message.content.substring(6, message.content.length);
+  var searchParameters = message.content.substring(7, message.content.length);
 
   youtube.search.list({
     key: config.api.youtube,
@@ -74,17 +75,17 @@ var handleMessage = function(bot, message) {
   });
 
 
-  if (message.content.length < 6) {
-    return message.reply('please provide a YouTube video ID.');
+  if (message.content.length < 7) {
+    return message.reply('I couldn\'t find that song.');
   }
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/play ') || input == '/play';
+  return _.startsWith(input, '/q add ') || input == '/q add';
 };
 
 var handleActiveRequest = function(bot, message, request) {
-  console.log('handling request from play');
+  console.log('handling request from queue');
 
   var content = message.content.trim();
 
@@ -92,36 +93,9 @@ var handleActiveRequest = function(bot, message, request) {
     // Get YT ID for this result
     var item = request.data[parseInt(message.content) - 1];
     if (item) {
-      var youtubeId = item.id.videoId;
+      queueHandler.queueSong(bot, message, item);
 
-      // Invoke song player
-      tt.playSong(bot, message.member.voiceChannel, 'https://www.youtube.com/watch?v=' + youtubeId);
-
-      // Send back a Now Playing message
-      var embed = new Discord.RichEmbed();
-
-      embed.setThumbnail(item.snippet.thumbnails.medium.url);
-      embed.setFooter('Queued by DJ ' + message.author.username, message.author.avatarURL);
-      embed.setTimestamp(new Date());
-      embed.setAuthor(bot.user.username, bot.user.avatarURL);
-      embed.setTitle('Now Playing');
-      embed.setDescription(item.snippet.title);
-
-      var promise = message.channel.send('', { embed: embed });
-      promise.then(function(message) {
-        var upvotePromise = message.react('👍');
-        upvotePromise.then(function(messageReaction) {
-          messageReaction.message.react('👎');
-        });
-
-        var state = {
-          channel: message.channel,
-          user: message.author,
-          newSongMessage: message
-        };
-
-        tt.setState(state);
-      });
+      
 
       // Remove this request from the active queue
       messageHandler.removeRequest(request.id);

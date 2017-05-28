@@ -94,9 +94,6 @@ var handleActiveRequest = function(bot, message, request) {
     if (item) {
       var youtubeId = item.id.videoId;
 
-      // Invoke song player
-      tt.playSong(bot, message.member.voiceChannel, 'https://www.youtube.com/watch?v=' + youtubeId);
-
       // Send back a Now Playing message
       var embed = new Discord.RichEmbed();
 
@@ -108,19 +105,14 @@ var handleActiveRequest = function(bot, message, request) {
       embed.setDescription(item.snippet.title);
 
       var promise = message.channel.send('', { embed: embed });
-      promise.then(function(message) {
-        var upvotePromise = message.react('👍');
+      promise.then(function(nowPlaying) {
+        // Invoke song player
+        tt.playSong(bot, message, nowPlaying, 'https://www.youtube.com/watch?v=' + youtubeId);
+
+        var upvotePromise = nowPlaying.react('👍');
         upvotePromise.then(function(messageReaction) {
           messageReaction.message.react('👎');
         });
-
-        var state = {
-          channel: message.channel,
-          user: message.author,
-          newSongMessage: message
-        };
-
-        tt.setState(state);
       });
 
       // Remove this request from the active queue

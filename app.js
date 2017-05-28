@@ -42,6 +42,9 @@ bot.on('ready', function(data) {
 	// Load hooks
 	hookHandler.loadHooks(bot);
 
+  // Set game to welcome message
+  bot.user.setGame('/help');
+
   // Populate game sessions object 
   // gameSessionHandler.populateGameSessions(bot);
 

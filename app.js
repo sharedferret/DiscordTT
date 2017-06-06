@@ -31,9 +31,9 @@ bot.on('message', function(message) {
 bot.on('ready', function(data) {
   // Try to disconnect from any active voice channels
   console.log('VCs: ', bot.voiceConnections);
-  for (var channel of bot.voiceConnections) {
-    console.log('disconnecting from ' + channel);
-    channel.destroy();
+  for (var connection of bot.voiceConnections) {
+    console.log('disconnecting from ' + connection);
+    bot.voiceConnections[connection].disconnect();
   }
 
 	// Load commands
@@ -85,17 +85,9 @@ function exitHandler(options, err) {
 
   if (err) console.log(err.stack);
 
-  console.log('VC count: ', bot.voiceConnections.length);
-
-  for (var i in bot.voiceConnections) {
-    bot.voiceConnections[i].disconnect();
-  }
-
-  // Try to disconnect from any active voice channels 
-  for (var channel of bot.voiceConnections) {
-    console.log('disconnecting from ' + channel);
-    channel.disconnect();
-  }
+  bot.voiceConnections.every(function(i) {
+    return i.disconnect();
+  });
 
   if (options.exit) process.exit();
 }

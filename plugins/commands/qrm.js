@@ -1,6 +1,6 @@
-var name = ['/q remove '];
+var name = ['/q- ', '/q remove '];
 var description = 'Removes a song from your playlist.';
-var usage = '`/q remove [song name or YouTube ID]`:';
+var usage = '`/q remove [queue location]`:\n`/q- [queue location]:`';
 
 var messageHandler = require(global.paths.lib + 'message-handler');
 var queueHandler = require(global.paths.lib + 'queue-handler');
@@ -11,21 +11,17 @@ var Discord = require('discord.js');
 var uuid = require('uuid/v4');
 
 var handleMessage = function(bot, message) {
-  // TODO: This will need to occur in a lib handler
-  // TODO: This loop will act as the bot's main event loop when a DJ session is active
-  // TODO: Optimize for bandwidth constraints (e.g. cache downloaded songs)
+  var positionString = message.content.substring(message.content.startsWith('/q-') ? 4 : 10, message.content.length);
 
-  if (message.content.length < 10) {
+  if (positionString == '') {
     return message.reply('please provide a position.');
   }
 
-  var queuePosition = parseInt(message.content.substring(10, message.content.length));
-
-  queueHandler.removeSong(bot, message, queuePosition);
+  queueHandler.removeSong(bot, message, parseInt(positionString));
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/q remove ') || input == '/q remove';
+  return _.startsWith(input, '/q remove') || _.startsWith(input, '/q-');
 };
 
 module.exports = {

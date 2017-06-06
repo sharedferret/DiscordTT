@@ -25,7 +25,8 @@ db.serialize(function() {
     'upvotes INTEGER DEFAULT 0 NOT NULL, ' +
     'downvotes INTEGER DEFAULT 0 NOT NULL, ' +
     'points INTEGER DEFAULT 0 NOT NULL, ' +
-    'lastActive DATETIME)');
+    'lastActive DATETIME, ' +
+    'metadata TEXT)');
 
   console.log('- Creating UserQueue');
   db.run('CREATE TABLE IF NOT EXISTS UserQueue (' +

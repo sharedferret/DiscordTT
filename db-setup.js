@@ -37,7 +37,8 @@ db.serialize(function() {
 
   console.log('- Creating SongHistory');
   db.run('CREATE TABLE IF NOT EXISTS SongHistory (' +
-    'serverId TEXT PRIMARY KEY NOT NULL, ' +
+    'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+    'serverId TEXT NOT NULL, ' +
     'djid TEXT NOT NULL, ' +
     'songId TEXT NOT NULL, ' +
     'time DATETIME, ' +

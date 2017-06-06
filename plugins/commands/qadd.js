@@ -1,6 +1,6 @@
-var name = ['/q add '];
+var name = ['/q+ ', '/q add '];
 var description = 'Adds a song to your playlist.';
-var usage = '`/q add [song name or YouTube ID]`:';
+var usage = '`/q+ [song name or YouTube ID]`\n`/q add [song name or YouTube ID]`';
 
 var messageHandler = require(global.paths.lib + 'message-handler');
 var queueHandler = require(global.paths.lib + 'queue-handler');
@@ -11,15 +11,11 @@ var Discord = require('discord.js');
 var uuid = require('uuid/v4');
 
 var handleMessage = function(bot, message) {
-  // TODO: This will need to occur in a lib handler
-  // TODO: This loop will act as the bot's main event loop when a DJ session is active
-  // TODO: Optimize for bandwidth constraints (e.g. cache downloaded songs)
+  var searchParameters = message.content.substring(message.content.startsWith('/q+') ? 4 : 7, message.content.length);
 
-  if (message.content.length < 7) {
+  if (searchParameters == '') {
     return message.reply('no results found.');
   }
-
-  var searchParameters = message.content.substring(7, message.content.length);
 
   youtube.search.list({
     key: config.api.youtube,
@@ -29,7 +25,8 @@ var handleMessage = function(bot, message) {
     q: searchParameters
   }, function(error, response) {
     if (error) {
-      return console.warn('An error occurred while searching YouTube', error);
+      console.warn('An error occurred while searching YouTube', error);
+      return message.reply('I was unable to find matching songs for your request.');
     }
 
     if (response.items[0]) {
@@ -39,9 +36,9 @@ var handleMessage = function(bot, message) {
       embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
       embed.setTimestamp(new Date());
 
-      embed.setTitle('Select a song to play');
+      embed.setTitle('Select a song to add');
 
-      var description = '_Respond within 10 seconds with the number of the song you\'d like to play_\n\n';
+      var description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';
 
       for (var i in response.items) {
         description += (parseInt(i) + 1) + ') [' + response.items[i].snippet.title +'](https://www.youtube.com/watch?v=' + response.items[i].id.videoId + ')\n';
@@ -73,15 +70,10 @@ var handleMessage = function(bot, message) {
       message.channel.send('', { embed: embed });
     }
   });
-
-
-  if (message.content.length < 7) {
-    return message.reply('I couldn\'t find that song.');
-  }
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/q add ') || input == '/q add';
+  return _.startsWith(input, '/q add') || _.startsWith(input, '/q+');
 };
 
 var handleActiveRequest = function(bot, message, request) {
@@ -94,8 +86,6 @@ var handleActiveRequest = function(bot, message, request) {
     var item = request.data[parseInt(message.content) - 1];
     if (item) {
       queueHandler.queueSong(bot, message, item);
-
-      
 
       // Remove this request from the active queue
       messageHandler.removeRequest(request.id);

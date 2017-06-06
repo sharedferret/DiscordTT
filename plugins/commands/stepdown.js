@@ -1,13 +1,12 @@
-var name = ['/q', '/q view'];
-var description = 'View your playlist.';
-var usage = '`/q view`\n`/q`';
+var name = ['/stepdown'];
+var description = 'Removes you from the decks.';
+var usage = '`/stepdown`';
+var hidden = true;
 
-var queueHandler = require(global.paths.lib + 'queue-handler');
 var tt = require(global.paths.lib + 'turntable-handler');
-var Discord = require('discord.js');
 
 var handleMessage = function(bot, message) {
-  queueHandler.viewQueue(bot, message);
+  tt.removeDj(bot, message);
 };
 
 var matches = function(input) {
@@ -17,7 +16,8 @@ var matches = function(input) {
 module.exports = {
   name: name,
   description: description,
-  handleMessage: handleMessage,
   usage: usage,
+  hidden: hidden,
+  handleMessage: handleMessage,
   matches: matches
 };

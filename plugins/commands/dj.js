@@ -3,8 +3,10 @@ var description = 'Adds you to the queue to DJ.';
 var usage = '`/dj`: Adds you to the DJ queue. If there is room on the table, you will step up and begin playing music.';
 var hidden = true;
 
+var tt = require(global.paths.lib + 'turntable-handler');
+
 var handleMessage = function(bot, message) {
-  message.reply('this command has not been implemented.');
+  tt.addDj(bot, message);
 };
 
 var matches = function(input) {

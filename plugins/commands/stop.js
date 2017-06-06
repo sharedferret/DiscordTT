@@ -1,10 +1,11 @@
-var name = ['/skip'];
-var description = 'Skips the currently playing song.';
+var name = ['/stop'];
+var description = 'Forcefully stops the TT plugin.';
 
 var tt = require(global.paths.lib + 'turntable-handler');
 
 var handleMessage = function(bot, message) {
-  tt.skipSong();
+  tt.stop();
+  message.reply('TT plugin stopped.');
 };
 
 var matches = function(input) {

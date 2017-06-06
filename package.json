@@ -14,6 +14,7 @@
 	"dependencies": {
 		"async": "*",
 		"discord.js": "~11.1.0",
+		"git-rev": "*",
 		"googleapis": "~2.1.7",
 		"lodash": "~4.3.0",
 		"moment": "*",
@@ -27,5 +28,5 @@
 		"uuid": "*",
 		"ytdl-core": "*"
 	},
-	"version": "0.1.0"
+	"version": "0.2.0"
 }

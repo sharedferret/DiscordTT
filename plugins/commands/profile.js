@@ -1,4 +1,4 @@
-var name = ['/profile'];
+var name = [config.discriminator + 'profile'];
 var description = 'View your profile.';
 
 var tt = require(global.paths.lib + 'turntable-handler');
@@ -53,7 +53,7 @@ var displayProfileForUser = function(bot, message, user) {
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/profile');
+  return _.startsWith(input, config.discriminator + 'profile');
 };
 
 module.exports = {

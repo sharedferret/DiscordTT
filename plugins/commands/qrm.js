@@ -1,6 +1,6 @@
-var name = ['/q- ', '/q remove '];
+var name = [config.discriminator + 'q- ', config.discriminator + 'q remove '];
 var description = 'Removes a song from your playlist.';
-var usage = '`/q remove [queue location]`:\n`/q- [queue location]:`';
+var usage = '`' + config.discriminator + 'q remove [queue location]`:\n`' + config.discriminator + 'q- [queue location]:`';
 
 var messageHandler = require(global.paths.lib + 'message-handler');
 var queueHandler = require(global.paths.lib + 'queue-handler');
@@ -11,7 +11,7 @@ var Discord = require('discord.js');
 var uuid = require('uuid/v4');
 
 var handleMessage = function(bot, message) {
-  var positionString = message.content.substring(message.content.startsWith('/q-') ? 4 : 10, message.content.length);
+  var positionString = message.content.substring(message.content.startsWith('/q-') ? config.discriminator.length + 3 : config.discriminator.length + 9, message.content.length);
 
   if (positionString == '') {
     return message.reply('please provide a position.');
@@ -21,7 +21,7 @@ var handleMessage = function(bot, message) {
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/q remove') || _.startsWith(input, '/q-');
+  return _.startsWith(input, config.discriminator + 'q remove') || _.startsWith(input, config.discriminator + 'q-');
 };
 
 module.exports = {

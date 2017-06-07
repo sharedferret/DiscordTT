@@ -1,6 +1,6 @@
-var name = ['/dj'];
+var name = [config.discriminator + 'dj'];
 var description = 'Adds you to the queue to DJ.';
-var usage = '`/dj`: Adds you to the DJ queue. If there is room on the table, you will step up and begin playing music.';
+var usage = '`' + config.discriminator + 'dj`: Adds you to the DJ queue. If there is room on the table, you will step up and begin playing music.';
 var hidden = true;
 
 var tt = require(global.paths.lib + 'turntable-handler');

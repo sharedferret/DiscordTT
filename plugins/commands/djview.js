@@ -1,4 +1,4 @@
-var name = ['/djs', '/view'];
+var name = [config.discriminator + 'djs', config.discriminator + 'view'];
 var description = 'View DJs';
 
 var tt = require(global.paths.lib + 'turntable-handler');

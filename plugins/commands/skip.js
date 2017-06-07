@@ -1,4 +1,4 @@
-var name = ['/skip'];
+var name = [config.discriminator + 'skip'];
 var description = 'Skips the currently playing song.';
 
 var tt = require(global.paths.lib + 'turntable-handler');

@@ -1,6 +1,6 @@
-var name = ['/q+ ', '/q add '];
+var name = [config.discriminator + 'q+ ', config.discriminator + 'q add '];
 var description = 'Adds a song to your playlist.';
-var usage = '`/q+ [song name or YouTube ID]`\n`/q add [song name or YouTube ID]`';
+var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
 
 var messageHandler = require(global.paths.lib + 'message-handler');
 var queueHandler = require(global.paths.lib + 'queue-handler');
@@ -11,7 +11,7 @@ var Discord = require('discord.js');
 var uuid = require('uuid/v4');
 
 var handleMessage = function(bot, message) {
-  var searchParameters = message.content.substring(message.content.startsWith('/q+') ? 4 : 7, message.content.length);
+  var searchParameters = message.content.substring(message.content.startsWith(config.discriminator + 'q+') ? config.discriminator.length + 3 : config.discriminator.length + 6, message.content.length);
 
   if (searchParameters == '') {
     return message.reply('no results found.');
@@ -73,7 +73,7 @@ var handleMessage = function(bot, message) {
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/q add') || _.startsWith(input, '/q+');
+  return _.startsWith(input, config.discriminator + 'q add') || _.startsWith(input, config.discriminator + 'q+');
 };
 
 var handleActiveRequest = function(bot, message, request) {

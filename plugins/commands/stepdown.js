@@ -1,6 +1,6 @@
-var name = ['/stepdown'];
+var name = [config.discriminator + 'stepdown'];
 var description = 'Removes you from the decks.';
-var usage = '`/stepdown`';
+var usage = '`' + config.discriminator + 'stepdown`';
 var hidden = true;
 
 var tt = require(global.paths.lib + 'turntable-handler');

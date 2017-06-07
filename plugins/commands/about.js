@@ -1,6 +1,6 @@
-var name = ['/about'];
+var name = [config.discriminator + 'about'];
 var description = 'Find out about Tohru!';
-var usage = '`/about`: List all commands.';
+var usage = '`' + config.discriminator + 'about`: List all commands.';
 
 var Discord = require('discord.js');
 var git = require('git-rev');

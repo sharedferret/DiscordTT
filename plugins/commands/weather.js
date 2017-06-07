@@ -1,6 +1,6 @@
-var name = ['/weather '];
+var name = [config.discriminator + 'weather '];
 var description = 'Gets the current conditions and weather forecast for a given location.';
-var usage = '`/weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
+var usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
 var hidden = true;
 
 var request = require('request');
@@ -8,7 +8,7 @@ var Discord = require('discord.js');
 var moment = require('moment');
 
 var handleMessage = function(bot, message) {
-  var searchParameters = message.content.substring(9, message.content.length);
+  var searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
 
   // Form request URL
   // If a US zip is requested, switch API call
@@ -417,7 +417,7 @@ var weatherIconEmoji = {
 };
 
 var matches = function(input) {
-  return _.startsWith(input, '/weather ') || input == '/weather';
+  return _.startsWith(input, config.discriminator + 'weather ') || input == config.discriminator + 'weather';
 };
 
 module.exports = {

@@ -1,4 +1,4 @@
-var name = ['/stop'];
+var name = [config.discriminator + 'stop'];
 var description = 'Forcefully stops the TT plugin.';
 
 var tt = require(global.paths.lib + 'turntable-handler');

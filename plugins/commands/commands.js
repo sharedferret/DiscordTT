@@ -1,6 +1,6 @@
-var name = ['/help', '/commands'];
+var name = [config.discriminator + 'help', config.discriminator + 'commands'];
 var description = 'Lists the bot\'s available commands.';
-var usage = '`/help`: List all commands.\n`/help [command name]`: Show help page for a specific command.';
+var usage = '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.';
 
 var Discord = require('discord.js');
 var messageHandler = require(global.paths.lib + 'message-handler');
@@ -27,9 +27,9 @@ var handleMessage = function(bot, message) {
 
     message.channel.send('', { embed: embed });
   } else {
-    var commandName = message.content.substring(6, message.content.length);
-    if (!commandName.startsWith('/')) {
-      commandName = '/' + commandName;
+    var commandName = message.content.substring(config.discriminator.length + 5, message.content.length);
+    if (!commandName.startsWith(config.discriminator)) {
+      commandName = config.discriminator + commandName;
     }
 
     var requestedCommand = messageHandler.fetchCommand(commandName);
@@ -60,7 +60,7 @@ var handleMessage = function(bot, message) {
 };
 
 var matches = function(input) {
-  return name.indexOf(input.trim()) !== -1 || _.startsWith(input, '/help ');
+  return name.indexOf(input.trim()) !== -1 || _.startsWith(input, config.discriminator + 'help');
 };
 
 module.exports = {

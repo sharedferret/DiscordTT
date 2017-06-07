@@ -1,4 +1,4 @@
-var name = [config.discriminator + 'profile'];
+var name = ['profile'];
 var description = 'View your profile.';
 
 var tt = require(global.paths.lib + 'turntable-handler');

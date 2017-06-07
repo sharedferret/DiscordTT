@@ -1,4 +1,4 @@
-var name = [config.discriminator + 'djs', config.discriminator + 'view'];
+var name = ['djs', 'view'];
 var description = 'View DJs';
 
 var tt = require(global.paths.lib + 'turntable-handler');
@@ -43,7 +43,7 @@ var handleMessage = function(bot, message) {
 };
 
 var matches = function(input) {
-  return name.indexOf(input.trim()) !== -1;
+  return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 
 module.exports = {

@@ -1,4 +1,4 @@
-var name = [config.discriminator + 'weather '];
+var name = ['weather '];
 var description = 'Gets the current conditions and weather forecast for a given location.';
 var usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
 var hidden = true;

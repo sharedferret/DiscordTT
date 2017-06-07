@@ -1,4 +1,4 @@
-var name = [config.discriminator + 'q+ ', config.discriminator + 'q add '];
+var name = ['q+ ', 'q add '];
 var description = 'Adds a song to your playlist.';
 var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
 

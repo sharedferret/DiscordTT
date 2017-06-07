@@ -6,15 +6,13 @@ var Discord = require('discord.js');
 var db = require(global.paths.lib + 'database-handler').db;
 
 var handleMessage = function(bot, message) {
-  console.log('starting embed');
-
   var embed = new Discord.RichEmbed();
 
   embed.setAuthor('Current DJs', bot.user.avatarURL);
   embed.setTimestamp(new Date());
 
-  tt.getVotesForSong(bot);
-  var state = tt.state;
+  tt.getVotesForSong(bot, message.guild.id);
+  var state = tt.getState(message.guild.id);
 
   if (state) {
     db.serialize(function() {

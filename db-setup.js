@@ -14,7 +14,8 @@ db.serialize(function() {
 
   console.log('- Creating Server');
   db.run('CREATE TABLE IF NOT EXISTS Server (' +
-    'id TEXT PRIMARY KEY)');
+    'id TEXT PRIMARY KEY, ' +
+    'settings TEXT)');
 
   console.log('- Creating User');
   db.run('CREATE TABLE IF NOT EXISTS User (' +
@@ -26,7 +27,8 @@ db.serialize(function() {
     'downvotes INTEGER DEFAULT 0 NOT NULL, ' +
     'points INTEGER DEFAULT 0 NOT NULL, ' +
     'lastActive DATETIME, ' +
-    'metadata TEXT)');
+    'metadata TEXT, ' +
+    'activePlaylistId TEXT)');
 
   console.log('- Creating UserQueue');
   db.run('CREATE TABLE IF NOT EXISTS UserQueue (' +
@@ -45,6 +47,13 @@ db.serialize(function() {
     'time DATETIME, ' +
     'upvotes INTEGER DEFAULT 0, ' +
     'downvotes INTEGER DEFAULT 0)');
+
+  console.log('- Creating Playlist');
+  db.run('CREATE TABLE IF NOT EXISTS Playlist (' +
+    'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+    'userId TEXT NOT NULL, ' +
+    'name TEXT, ' +
+    'metadata TEXT)');
 });
 
 db.close();

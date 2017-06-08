@@ -1,6 +1,6 @@
-var name = ['q', 'q view'];
+var name = ['q'];
 var description = 'View your playlist.';
-var usage = '`' + config.discriminator + 'q view`\n`' + config.discriminator + 'q`';
+var usage = '`' + config.discriminator + 'q`\n`' + config.discriminator + 'q`';
 
 var queueHandler = require(global.paths.lib + 'queue-handler');
 var tt = require(global.paths.lib + 'turntable-handler');

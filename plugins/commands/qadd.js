@@ -11,7 +11,15 @@ var Discord = require('discord.js');
 var uuid = require('uuid/v4');
 
 var handleMessage = function(bot, message) {
-  var searchParameters = message.content.substring(message.content.startsWith(config.discriminator + 'q+') ? config.discriminator.length + 3 : config.discriminator.length + 6, message.content.length);
+  var searchParameters = '';
+
+  if (message.content.startsWith(config.discriminator + 'q+')) {
+    searchParameters = message.content.substring(config.discriminator.length + 3, message.content.length);
+  } else if (message.content.startsWith(config.discriminator + 'q ')) {
+    searchParameters = message.content.substring(config.discriminator.length + 2, message.content.length);
+  } else {
+    searchParameters = message.content.substring(config.discriminator.length + 6, message.content.length);
+  }
 
   if (searchParameters == '') {
     return message.reply('no results found.');

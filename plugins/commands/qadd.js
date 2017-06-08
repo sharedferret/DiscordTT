@@ -1,4 +1,4 @@
-var name = ['q+ ', 'q add '];
+var name = ['q+ ', 'q add ', 'q '];
 var description = 'Adds a song to your playlist.';
 var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
 
@@ -73,7 +73,9 @@ var handleMessage = function(bot, message) {
 };
 
 var matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'q add') || _.startsWith(input, config.discriminator + 'q+');
+  return _.startsWith(input, config.discriminator + 'q add') || 
+    _.startsWith(input, config.discriminator + 'q+') ||
+    _.startsWith(input, config.discriminator + 'q ');
 };
 
 var handleActiveRequest = function(bot, message, request) {

@@ -16,6 +16,7 @@
 		"discord.js": "~11.1.0",
 		"git-rev": "*",
 		"googleapis": "~2.1.7",
+		"humanize": "*",
 		"lodash": "~4.3.0",
 		"moment": "*",
 		"moment-precise-range-plugin": "*",

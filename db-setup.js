@@ -36,7 +36,8 @@ db.serialize(function() {
     'userId TEXT, ' +
     'position INTEGER NOT NULL, ' +
     'songId TEXT NOT NULL,' +
-    'dateAdded DATETIME)');
+    'dateAdded DATETIME,' +
+    'playlistId TEXT)');
 
   console.log('- Creating SongHistory');
   db.run('CREATE TABLE IF NOT EXISTS SongHistory (' +

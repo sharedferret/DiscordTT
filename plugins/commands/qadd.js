@@ -1,4 +1,4 @@
-var name = ['q+ ', 'q add ', 'q '];
+var name = ['q+ ', 'q add '];
 var description = 'Adds a song to your playlist.';
 var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
 
@@ -15,8 +15,6 @@ var handleMessage = function(bot, message) {
 
   if (message.content.startsWith(config.discriminator + 'q+')) {
     searchParameters = message.content.substring(config.discriminator.length + 3, message.content.length);
-  } else if (message.content.startsWith(config.discriminator + 'q ')) {
-    searchParameters = message.content.substring(config.discriminator.length + 2, message.content.length);
   } else {
     searchParameters = message.content.substring(config.discriminator.length + 6, message.content.length);
   }
@@ -82,8 +80,7 @@ var handleMessage = function(bot, message) {
 
 var matches = function(input) {
   return _.startsWith(input, config.discriminator + 'q add') || 
-    _.startsWith(input, config.discriminator + 'q+') ||
-    _.startsWith(input, config.discriminator + 'q ');
+    _.startsWith(input, config.discriminator + 'q+');
 };
 
 var handleActiveRequest = function(bot, message, request) {

@@ -26,8 +26,8 @@ var handleMessage = function(bot, message) {
       embed.addField('Version', pkg.version);
     }
     
-    embed.addField('Servers', bot.guilds.size - 1);
-    embed.addField('Users', bot.users.size - 1);
+    embed.addField('Servers', bot.guilds.size);
+    embed.addField('Users', bot.users.size);
 
     message.channel.send('', { embed: embed });
   });

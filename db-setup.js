@@ -51,7 +51,7 @@ db.serialize(function() {
 
   console.log('- Creating Playlist');
   db.run('CREATE TABLE IF NOT EXISTS Playlist (' +
-    'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+    'id TEXT PRIMARY KEY, ' +
     'userId TEXT NOT NULL, ' +
     'name TEXT, ' +
     'metadata TEXT)');

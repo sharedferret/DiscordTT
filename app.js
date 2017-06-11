@@ -1,37 +1,23 @@
 require('./globals');
 
-var util = require('util');
+const util = require('util');
 
-var Discord = require('discord.js');
-var bot = new Discord.Client();
+const Discord = require('discord.js');
+const bot = new Discord.Client();
 
-var messageHandler = require(global.paths.lib + 'message-handler');
-var hookHandler = require(global.paths.lib + 'hook-handler');
-var databaseHandler = require(global.paths.lib + 'database-handler');
-var tt = require(global.paths.lib + 'turntable-handler');
-// var gameSessionHandler = require(global.paths.lib + 'game-session-handler');
+const messageHandler = require(global.paths.lib + 'message-handler');
+const hookHandler = require(global.paths.lib + 'hook-handler');
+const databaseHandler = require(global.paths.lib + 'database-handler');
+const tt = require(global.paths.lib + 'turntable-handler');
  
 bot.on('message', function(message) {
-  /**
-  console.log('Message: ', {
-		id: message.id,
-		channel: message.channel.name,
-		server: message.channel.server.name,
-		tts: message.tts,
-		timestamp: message.timestamp,
-		author: message.author.username,
-		content: message.cleanContent,
-		mentions: _.map(message.mentions, 'username')
-	}); */
-
-	// console.log('[' + message.author.username + '] ' + message.cleanContent);
 	messageHandler.handleMessage(bot, message);
 });
 
 bot.on('ready', function(data) {
   // Try to disconnect from any active voice channels
   console.log('VCs: ', bot.voiceConnections);
-  for (var connection of bot.voiceConnections) {
+  for (let connection of bot.voiceConnections) {
     console.log('disconnecting from ' + connection);
     bot.voiceConnections[connection].disconnect();
   }
@@ -44,31 +30,6 @@ bot.on('ready', function(data) {
 
   // Set game to welcome message
   bot.user.setGame('/help');
-
-  // Populate game sessions object 
-  // gameSessionHandler.populateGameSessions(bot);
-
-  // Create watcher loop
-  // TODO: Replace this with something sane/more robust
-  /** 
-  setTimeout(function() {
-    bot.fetchUser(bot.user.id)
-      .then(function(user) {
-        user.sendMessage('/healthcheck')
-          .then(function(message) {
-            console.log('deleting');
-            message.delete();
-          }).catch(function(e) {
-            console.log(e);
-        });
-    });
-
-  }, 5000);
-  */
-});
-
-bot.on('presence', function(staleUser, user) {
-  // gameSessionHandler.presenceUpdated(staleUser, user);
 });
 
 bot.on('reconnecting', function() {

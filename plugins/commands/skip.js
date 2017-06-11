@@ -1,14 +1,14 @@
-var name = ['skip'];
-var description = 'Skips the currently playing song.';
-var type = CommandType.TTMusic;
+const name = ['skip'];
+const description = 'Skips the currently playing song.';
+const type = CommandType.TTMusic;
 
-var tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler');
 
-var handleMessage = function(bot, message) {
+const handleMessage = function(bot, message) {
   tt.skipSong(message.guild.id);
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 

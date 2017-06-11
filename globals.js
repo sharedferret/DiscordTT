@@ -1,5 +1,5 @@
-var path = require('path');
-var appRoot = path.resolve(__dirname);
+const path = require('path');
+const appRoot = path.resolve(__dirname);
 
 global.config = require('./config');
 global._ = require('lodash');

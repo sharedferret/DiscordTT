@@ -1,19 +1,19 @@
-var name = ['weather '];
-var description = 'Gets the current conditions and weather forecast for a given location.';
-var usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
-var type = CommandType.General;
-var hidden = false;
+const name = ['weather '];
+const description = 'Gets the current conditions and weather forecast for a given location.';
+const usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
+const type = CommandType.General;
+const hidden = false;
 
-var request = require('request');
-var Discord = require('discord.js');
-var moment = require('moment');
+const request = require('request');
+const Discord = require('discord.js');
+const moment = require('moment');
 
-var handleMessage = function(bot, message) {
-  var searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
+const handleMessage = function(bot, message) {
+  const searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
 
   // Form request URL
   // If a US zip is requested, switch API call
-  var apiUrl;
+  let apiUrl;
 
   if (/^\d{5}(-\d{4})?$/.test(searchParameters)) {
     apiUrl = 'http://api.openweathermap.org/data/2.5/weather?appid=' + config.api.openweathermap + '&zip=' + searchParameters
@@ -26,16 +26,13 @@ var handleMessage = function(bot, message) {
       if (error) return console.log(error);
       if (!response.statusCode == 200) return console.log('Non-200 response received', response);
 
-      var weather = JSON.parse(body);
+      const weather = JSON.parse(body);
 
       if (weather.cod != 200) {
         return message.reply('I couldn\'t find that city.');
       }
 
-      var embed = new Discord.RichEmbed();
-
-      // var sunrise = moment(weather.sys.sunrise * 1000).local();
-      // var sunset = moment(weather.sys.sunset * 1000).local();
+      const embed = new Discord.RichEmbed();
 
       embed.setTitle(':flag_' + (weather.sys.country).toLowerCase() + ': Weather for ' + weather.name + ', ' + countryForCode[weather.sys.country] + ' (' + formatLatitude(weather.coord.lat) + ', ' + formatLongitude(weather.coord.lon) + ')');
       embed.addField('Conditions', weatherIconEmoji[weather.weather[0].icon] + ' ' + weather.weather[0].main, true);
@@ -61,41 +58,42 @@ var handleMessage = function(bot, message) {
     });
 };
 
-var kelvinToFahrenheit = function(value) {
+// TODO: All helper functions to a common class
+const kelvinToFahrenheit = function(value) {
   return parseFloat(value) * 1.8 - 459.67;
 };
 
-var kelvinToCelsius = function(value) {
+const kelvinToCelsius = function(value) {
   return parseFloat(value) - 273.15;
 };
 
-var metersToMiles = function(value) {
+const metersToMiles = function(value) {
   return parseFloat(value) * 0.00062137119223;
 };
 
-var mpsToMph = function(value) {
+const mpsToMph = function(value) {
   return parseFloat(value) * 2.236936;
 };
 
-var mpsToKph = function(value) {
+const mpsToKph = function(value) {
   return parseFloat(value) * 3.6;
 }
 
-var hpaToInhg = function(value) {
+const hpaToInhg = function(value) {
   return parseFloat(value) * 0.0295299830714;
 };
 
-var formatLatitude = function(value) {
-  var hemisphere = value >= 0 ? '°N' : '°S';
+const formatLatitude = function(value) {
+  const hemisphere = value >= 0 ? '°N' : '°S';
   return Math.abs(value).toFixed(2) + hemisphere;
 };
 
-var formatLongitude = function(value) {
-  var hemisphere = value >= 0 ? '°E' : '°W';
+const formatLongitude = function(value) {
+  const hemisphere = value >= 0 ? '°E' : '°W';
   return Math.abs(value).toFixed(2) + hemisphere;
 }
 
-var emojiForDirection = function(value) {
+const emojiForDirection = function(value) {
   if (value < 22.5) return ':arrow_up:';
   if (value < 67.5) return ':arrow_upper_right:';
   if (value < 112.5) return ':arrow_right:';
@@ -107,8 +105,9 @@ var emojiForDirection = function(value) {
   return ':arrow_up:';
 };
 
-var emojiForTime = function(time) {
-  var minutes = time.hours() * 60 + time.minutes();
+// TODO: Possibly make this less ugly
+const emojiForTime = function(time) {
+  let minutes = time.hours() * 60 + time.minutes();
 
   if (minutes > 720) minutes = minutes - 720;
 
@@ -139,8 +138,9 @@ var emojiForTime = function(time) {
   return ':clock12:';
 };
 
+// TODO: Own file
 // Convert ISO 3166-2 to readable country name
-var countryForCode = {
+const countryForCode = {
   AC: 'Ascension',
   AD: 'Andorra',
   AE: 'United Arab Emirates',
@@ -396,7 +396,7 @@ var countryForCode = {
   ZW: 'Zimbabwe'
 };
 
-var weatherIconEmoji = {
+const weatherIconEmoji = {
   '01d': ':sunny:',
   '01n': ':sunny:',
   '02d': ':partly_sunny:',
@@ -417,7 +417,7 @@ var weatherIconEmoji = {
   '50n': ':fog:'
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return _.startsWith(input, config.discriminator + 'weather ') || input == config.discriminator + 'weather';
 };
 

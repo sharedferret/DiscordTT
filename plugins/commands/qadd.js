@@ -1,18 +1,18 @@
-var name = ['q+ ', 'q add '];
-var description = 'Adds a song to your playlist.';
-var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
-var type = CommandType.TTPlaylist;
+const name = ['q+ ', 'q add '];
+const description = 'Adds a song to your playlist.';
+const usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
+const type = CommandType.TTPlaylist;
 
-var messageHandler = require(global.paths.lib + 'message-handler');
-var queueHandler = require(global.paths.lib + 'queue-handler');
-var tt = require(global.paths.lib + 'turntable-handler');
-var google = require('googleapis');
-var youtube = google.youtube('v3');
-var Discord = require('discord.js');
-var uuid = require('uuid/v4');
+const messageHandler = require(global.paths.lib + 'message-handler');
+const queueHandler = require(global.paths.lib + 'queue-handler');
+const tt = require(global.paths.lib + 'turntable-handler');
+const google = require('googleapis');
+const youtube = google.youtube('v3');
+const Discord = require('discord.js');
+const uuid = require('uuid/v4');
 
-var handleMessage = function(bot, message) {
-  var searchParameters = '';
+const handleMessage = function(bot, message) {
+  let searchParameters = '';
 
   if (message.content.startsWith(config.discriminator + 'q+')) {
     searchParameters = message.content.substring(config.discriminator.length + 3, message.content.length);
@@ -37,7 +37,7 @@ var handleMessage = function(bot, message) {
     }
 
     if (response.items[0]) {
-      var embed = new Discord.RichEmbed();
+      const embed = new Discord.RichEmbed();
 
       embed.setAuthor(bot.user.username, bot.user.avatarURL);
       embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
@@ -45,7 +45,7 @@ var handleMessage = function(bot, message) {
 
       embed.setTitle('Select a song to add');
 
-      var description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';
+      let description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';
 
       for (var i in response.items) {
         description += (parseInt(i) + 1) + ') [' + response.items[i].snippet.title +'](https://www.youtube.com/watch?v=' + response.items[i].id.videoId + ')\n';
@@ -55,7 +55,7 @@ var handleMessage = function(bot, message) {
 
       console.log('adding request');
 
-      var id = uuid();
+      const id = uuid();
 
       messageHandler.addRequest({
         type: 'queue',
@@ -66,7 +66,7 @@ var handleMessage = function(bot, message) {
         id: id
       });
 
-      var requestHandler = function(id) {
+      const requestHandler = function(id) {
         console.log('Removing request ' + id);
         messageHandler.removeRequest(id);
       };
@@ -79,19 +79,19 @@ var handleMessage = function(bot, message) {
   });
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return _.startsWith(input, config.discriminator + 'q add') || 
     _.startsWith(input, config.discriminator + 'q+');
 };
 
-var handleActiveRequest = function(bot, message, request) {
+const handleActiveRequest = function(bot, message, request) {
   console.log('handling request from queue');
 
-  var content = message.content.trim();
+  const content = message.content.trim();
 
   if (message.content >= 1 && message.content <= 3) {
     // Get YT ID for this result
-    var item = request.data[parseInt(message.content) - 1];
+    const item = request.data[parseInt(message.content) - 1];
     if (item) {
       queueHandler.queueSong(bot, message, item);
 

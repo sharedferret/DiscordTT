@@ -1,23 +1,23 @@
-var name = ['help', 'commands'];
-var description = 'Lists the bot\'s available commands.';
-var usage = '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.';
-var type = CommandType.General;
+const name = ['help', 'commands'];
+const description = 'Lists the bot\'s available commands.';
+const usage = '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.';
+const type = CommandType.General;
 
-var Discord = require('discord.js');
-var messageHandler = require(global.paths.lib + 'message-handler');
+const Discord = require('discord.js');
+const messageHandler = require(global.paths.lib + 'message-handler');
 
-var handleMessage = function(bot, message) {
+const handleMessage = function(bot, message) {
   if (message.content == config.discriminator + 'help' || message.content == config.discriminator + 'commands') {
     // TODO: Split commands by type, add ability to hide commands
-    var embed = new Discord.RichEmbed();
+    const embed = new Discord.RichEmbed();
     embed.setAuthor(bot.user.username, bot.user.avatarURL);
     embed.setTitle('Supported Commands');
-    embed.setDescription('Here\'s a list of all the commands I support. For more info, type `/help [command name]`.');
+    embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + config.discriminator + 'help [command name]`.');
     
-    var sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.type; });
+    const sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.type; });
     console.log('commands', sortedCommands);
 
-    for (var commandType in sortedCommands) {
+    for (let commandType in sortedCommands) {
       embed.addField(commandType,
         sortedCommands[commandType]
         .filter(function(i) { return i.hidden !== true; })
@@ -31,15 +31,15 @@ var handleMessage = function(bot, message) {
 
     message.channel.send('', { embed: embed });
   } else {
-    var commandName = message.content.substring(config.discriminator.length + 5, message.content.length);
+    let commandName = message.content.substring(config.discriminator.length + 5, message.content.length);
     if (!commandName.startsWith(config.discriminator)) {
       commandName = config.discriminator + commandName;
     }
 
-    var requestedCommand = messageHandler.fetchCommand(commandName);
+    const requestedCommand = messageHandler.fetchCommand(commandName);
 
     if (requestedCommand) {
-      var embed = new Discord.RichEmbed();
+      const embed = new Discord.RichEmbed();
       embed.setAuthor(bot.user.username, bot.user.avatarURL);
       embed.setTitle(typeof requestedCommand.name == 'string' ? requestedCommand.name : requestedCommand.name[0]);
       embed.setDescription('_' + (requestedCommand.description ? requestedCommand.description : 'No description available.') + '_');
@@ -63,7 +63,7 @@ var handleMessage = function(bot, message) {
   
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1 || _.startsWith(input, config.discriminator + 'help');
 };
 

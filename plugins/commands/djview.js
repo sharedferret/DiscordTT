@@ -1,19 +1,19 @@
-var name = ['djs', 'view'];
-var description = 'View DJs';
-var type = CommandType.TTMusic;
+const name = ['djs', 'view'];
+const description = 'View DJs';
+const type = CommandType.TTMusic;
 
-var tt = require(global.paths.lib + 'turntable-handler');
-var Discord = require('discord.js');
-var db = require(global.paths.lib + 'database-handler').db;
+const tt = require(global.paths.lib + 'turntable-handler');
+const Discord = require('discord.js');
+const db = require(global.paths.lib + 'database-handler').db;
 
-var handleMessage = function(bot, message) {
-  var embed = new Discord.RichEmbed();
+const handleMessage = function(bot, message) {
+  const embed = new Discord.RichEmbed();
 
   embed.setAuthor('Current DJs', bot.user.avatarURL);
   embed.setTimestamp(new Date());
 
   tt.getVotesForSong(bot, message.guild.id);
-  var state = tt.getState(message.guild.id);
+  const state = tt.getState(message.guild.id);
 
   if (state) {
     db.serialize(function() {
@@ -24,7 +24,7 @@ var handleMessage = function(bot, message) {
           if (err) console.log(err);
 
           for (var i in state.djs) {
-            var djName = (state.currentDj == i ? ':cd: ' : '') + state.djs[i].username;
+            const djName = (state.currentDj == i ? ':cd: ' : '') + state.djs[i].username;
             console.log('finding ' + state.djs[i].id);
             embed.addField(djName, _.find(result, function(j) { console.log('checking if ' + j.id + ' is equal to ' + state.djs[i].id); return j.id == state.djs[i].id; }).points + ' points', true);
           }
@@ -43,7 +43,7 @@ var handleMessage = function(bot, message) {
   }
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 

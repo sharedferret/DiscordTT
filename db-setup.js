@@ -1,9 +1,9 @@
 // Sets up DB tables
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('db.sqlite3');
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('db.sqlite3');
 
 db.serialize(function() {
-    console.log('- Creating Song');
+  console.log('- Creating Song');
   db.run('CREATE TABLE IF NOT EXISTS Song (' +
     'id TEXT PRIMARY KEY NOT NULL,' +
     'type TEXT NOT NULL,' +

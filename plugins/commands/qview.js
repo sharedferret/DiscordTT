@@ -1,17 +1,17 @@
-var name = ['q'];
-var description = 'View your playlist.';
-var usage = '`' + config.discriminator + 'q`\n`' + config.discriminator + 'q`';
-var type = CommandType.TTPlaylist;
+const name = ['q'];
+const description = 'View your playlist.';
+const usage = '`' + config.discriminator + 'q`\n`' + config.discriminator + 'q`';
+const type = CommandType.TTPlaylist;
 
-var queueHandler = require(global.paths.lib + 'queue-handler');
-var tt = require(global.paths.lib + 'turntable-handler');
-var Discord = require('discord.js');
+const queueHandler = require(global.paths.lib + 'queue-handler');
+const tt = require(global.paths.lib + 'turntable-handler');
+const Discord = require('discord.js');
 
-var handleMessage = function(bot, message) {
+const handleMessage = function(bot, message) {
   queueHandler.viewQueue(bot, message);
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 

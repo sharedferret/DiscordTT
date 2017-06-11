@@ -1,7 +1,6 @@
-var scheduler = require('node-schedule');
-var bot;
+const scheduler = require('node-schedule');
 
-var init = function(bot) {
+const init = function(bot) {
   /** 
   this.bot = bot;
   scheduler.scheduleJob('0 0 4 * * *', function() {

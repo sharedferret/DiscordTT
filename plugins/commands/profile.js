@@ -1,12 +1,12 @@
-var name = ['profile'];
-var description = 'View your profile.';
-var type = CommandType.Profile;
+const name = ['profile'];
+const description = 'View your profile.';
+const type = CommandType.Profile;
 
-var tt = require(global.paths.lib + 'turntable-handler');
-var Discord = require('discord.js');
-var db = require(global.paths.lib + 'database-handler').db;
+const tt = require(global.paths.lib + 'turntable-handler');
+const Discord = require('discord.js');
+const db = require(global.paths.lib + 'database-handler').db;
 
-var handleMessage = function(bot, message) {
+const handleMessage = function(bot, message) {
   if (message.mentions.users.size > 0) {
     console.log('showing profile for first mention');
     displayProfileForUser(bot, message, message.mentions.users.first());
@@ -15,8 +15,8 @@ var handleMessage = function(bot, message) {
   }
 };
 
-var displayProfileForUser = function(bot, message, user) {
-  var embed = new Discord.RichEmbed();
+const displayProfileForUser = function(bot, message, user) {
+  const embed = new Discord.RichEmbed();
 
   embed.setAuthor(user.username, user.avatarURL);
   embed.setTimestamp(new Date());
@@ -25,7 +25,7 @@ var displayProfileForUser = function(bot, message, user) {
 
   db.serialize(function() {
     db.get('SELECT points FROM User WHERE id=?', [ user.id ], function(err, row) {
-      var pointsText = '0 points';
+      let pointsText = '0 points';
 
       if (row && row.points) {
         pointsText = row.points == 1 ? '1 point' : row.points + ' points';
@@ -36,7 +36,7 @@ var displayProfileForUser = function(bot, message, user) {
       db.all('SELECT s.title AS title, COUNT(*) AS playcount, SUM(h.upvotes) AS up, SUM(h.downvotes) AS down FROM SongHistory h LEFT JOIN Song s ON s.id = h.songId WHERE h.djid = ? GROUP BY songId ORDER BY playcount DESC LIMIT 3',
         [ user.id ], function(mostPlayedErr, mostPlayedRows) {
 
-        var mostPlayed = '';
+        let mostPlayed = '';
 
         for (var i in mostPlayedRows) {
           var row = mostPlayedRows[i];
@@ -53,7 +53,7 @@ var displayProfileForUser = function(bot, message, user) {
   });
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return _.startsWith(input, config.discriminator + 'profile');
 };
 

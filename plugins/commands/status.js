@@ -1,25 +1,25 @@
-var name = ['status'];
-var description = 'Find out about Tohru!';
-var usage = '`' + config.discriminator + 'status`: Show bot vitals.';
-var type = CommandType.Utility;
+const name = ['status'];
+const description = 'Find out about Tohru!';
+const usage = '`' + config.discriminator + 'status`: Show bot vitals.';
+const type = CommandType.Utility;
 
-var Discord = require('discord.js');
-var git = require('git-rev');
-var pkg = require(global.paths.root + '/package.json');
-var moment = require('moment');
-var humanize = require('humanize');
-var tt = require(global.paths.lib + 'turntable-handler');
+const Discord = require('discord.js');
+const git = require('git-rev');
+const pkg = require(global.paths.root + '/package.json');
+const moment = require('moment');
+const humanize = require('humanize');
+const tt = require(global.paths.lib + 'turntable-handler');
 require('moment-precise-range-plugin');
 
-var handleMessage = function(bot, message) {
-  var embed = new Discord.RichEmbed();
+const handleMessage = function(bot, message) {
+  const embed = new Discord.RichEmbed();
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
 
-  var description = '';
+  let description = '';
 
   // Uptime
-  var status = '';
+  let status = '';
 
   status += 'Uptime: ' + moment.preciseDiff(global.startTime, new Date()) + '\n';
   status += 'Active audio streams: ' + (bot.voiceConnections.size) + '\n';
@@ -27,7 +27,7 @@ var handleMessage = function(bot, message) {
   embed.addField('Status', status);
 
   // Session data
-  var session = '';
+  let session = '';
 
   // Active streams
   session += 'Songs played: ' + tt.networkUsage.streams + '\n';
@@ -40,7 +40,7 @@ var handleMessage = function(bot, message) {
   message.channel.send('', { embed: embed });
 };
 
-var matches = function(input) {
+const matches = function(input) {
   return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 

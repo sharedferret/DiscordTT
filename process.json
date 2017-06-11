@@ -1,7 +1,8 @@
 {
   "apps": [{
-    "name": "rubychan",
+    "name": "Tohru",
     "script": "./app.js",
-    "watch": true
+    "watch": true,
+    "ignore_watch": ["db.sqlite3", "node_modules"]
   }]
 }

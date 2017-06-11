@@ -1,6 +1,7 @@
 var name = ['help', 'commands'];
 var description = 'Lists the bot\'s available commands.';
 var usage = '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.';
+var type = CommandType.General;
 
 var Discord = require('discord.js');
 var messageHandler = require(global.paths.lib + 'message-handler');
@@ -10,16 +11,19 @@ var handleMessage = function(bot, message) {
     // TODO: Split commands by type, add ability to hide commands
     var embed = new Discord.RichEmbed();
     embed.setAuthor(bot.user.username, bot.user.avatarURL);
+    embed.setTitle('Supported Commands');
     embed.setDescription('Here\'s a list of all the commands I support. For more info, type `/help [command name]`.');
-    embed.addField('Supported Commands', 
-      messageHandler.commands
-        .filter(function(i) {
-          return i.hidden !== true;
-        })
-        .map(function(i) { 
-          return config.discriminator + (typeof i.name == 'string' ? i.name : i.name[0]); 
-        })
+    
+    var sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.type; });
+    console.log('commands', sortedCommands);
+
+    for (var commandType in sortedCommands) {
+      embed.addField(commandType,
+        sortedCommands[commandType]
+        .filter(function(i) { return i.hidden !== true; })
+        .map(function(i) { return config.discriminator + (typeof i.name == 'string' ? i.name : i.name[0])})
         .join('\n'));
+    }
 
     embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
     embed.setTimestamp(new Date());
@@ -67,6 +71,7 @@ module.exports = {
   name: name,
   description: description,
   usage: usage,
+  type: type,
   handleMessage: handleMessage,
   matches: matches
 };

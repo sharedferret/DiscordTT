@@ -1,5 +1,6 @@
 var name = ['djs', 'view'];
 var description = 'View DJs';
+var type = CommandType.TTMusic;
 
 var tt = require(global.paths.lib + 'turntable-handler');
 var Discord = require('discord.js');
@@ -49,6 +50,7 @@ var matches = function(input) {
 module.exports = {
   name: name,
   description: description,
+  type: type,
   handleMessage: handleMessage,
   matches: matches
 };

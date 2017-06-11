@@ -1,7 +1,8 @@
 var name = ['weather '];
 var description = 'Gets the current conditions and weather forecast for a given location.';
 var usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
-var hidden = true;
+var type = CommandType.General;
+var hidden = false;
 
 var request = require('request');
 var Discord = require('discord.js');
@@ -424,6 +425,7 @@ module.exports = {
   name: name,
   description: description,
   usage: usage,
+  type: type,
   hidden: hidden,
   handleMessage: handleMessage,
   matches: matches

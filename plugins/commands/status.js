@@ -1,6 +1,7 @@
 var name = ['status'];
 var description = 'Find out about Tohru!';
 var usage = '`' + config.discriminator + 'status`: Show bot vitals.';
+var type = CommandType.Utility;
 
 var Discord = require('discord.js');
 var git = require('git-rev');
@@ -46,6 +47,7 @@ var matches = function(input) {
 module.exports = {
   name: name,
   description: description,
+  type: type,
   usage: usage,
   handleMessage: handleMessage,
   matches: matches

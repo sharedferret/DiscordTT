@@ -1,6 +1,7 @@
 var name = ['about'];
 var description = 'Find out about Tohru!';
 var usage = '`' + config.discriminator + 'about`: List all commands.';
+var type = CommandType.General;
 
 var Discord = require('discord.js');
 var git = require('git-rev');
@@ -40,6 +41,7 @@ module.exports = {
   name: name,
   description: description,
   usage: usage,
+  type: type,
   handleMessage: handleMessage,
   matches: matches
 };

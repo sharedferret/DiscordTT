@@ -1,5 +1,6 @@
 var name = ['stop'];
 var description = 'Forcefully stops the TT plugin.';
+var type = CommandType.TTMusic;
 
 var tt = require(global.paths.lib + 'turntable-handler');
 
@@ -14,6 +15,7 @@ var matches = function(input) {
 
 module.exports = {
   name: name,
+  type: type,
   handleMessage: handleMessage,
   matches: matches
 };

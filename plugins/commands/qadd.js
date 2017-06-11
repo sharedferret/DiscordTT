@@ -1,6 +1,7 @@
 var name = ['q+ ', 'q add '];
 var description = 'Adds a song to your playlist.';
 var usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
+var type = CommandType.TTPlaylist;
 
 var messageHandler = require(global.paths.lib + 'message-handler');
 var queueHandler = require(global.paths.lib + 'queue-handler');
@@ -104,6 +105,7 @@ module.exports = {
   name: name,
   description: description,
   usage: usage,
+  type: type,
   handleMessage: handleMessage,
   handleActiveRequest: handleActiveRequest,
   matches: matches

@@ -11,7 +11,9 @@ global.paths = {
   images: appRoot + '/assets/images/',
   lib: appRoot + '/lib/',
   commands: appRoot + '/plugins/commands/',
-  hooks: appRoot + '/plugins/hooks/'
+  hooks: appRoot + '/plugins/hooks/',
+  plugins: appRoot + '/plugins/'
 };
 
 global.startTime = new Date();
+global.CommandType = require(global.paths.plugins + 'commandtypes');

@@ -1,7 +1,8 @@
 var name = ['stepdown'];
 var description = 'Removes you from the decks.';
 var usage = '`' + config.discriminator + 'stepdown`';
-var hidden = true;
+var type = CommandType.TTMusic;
+var hidden = false;
 
 var tt = require(global.paths.lib + 'turntable-handler');
 
@@ -17,6 +18,7 @@ module.exports = {
   name: name,
   description: description,
   usage: usage,
+  type: type,
   hidden: hidden,
   handleMessage: handleMessage,
   matches: matches

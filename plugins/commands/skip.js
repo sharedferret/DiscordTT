@@ -1,5 +1,6 @@
 var name = ['skip'];
 var description = 'Skips the currently playing song.';
+var type = CommandType.TTMusic;
 
 var tt = require(global.paths.lib + 'turntable-handler');
 
@@ -13,6 +14,8 @@ var matches = function(input) {
 
 module.exports = {
   name: name,
+  description: description,
+  type: type,
   handleMessage: handleMessage,
   matches: matches
 };

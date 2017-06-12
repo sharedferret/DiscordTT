@@ -1,7 +1,9 @@
-const name = ['q+ ', 'q add '];
-const description = 'Adds a song to your playlist.';
-const usage = '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`';
-const type = CommandType.TTPlaylist;
+const info = {
+  name: ['q+ ', 'q add '],
+  description: 'Adds a song to your playlist.',
+  usage: '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`',
+  type: CommandType.TTPlaylist
+};
 
 const messageHandler = require(global.paths.lib + 'message-handler');
 const queueHandler = require(global.paths.lib + 'queue-handler');
@@ -102,10 +104,7 @@ const handleActiveRequest = function(bot, message, request) {
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  usage: usage,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
   handleActiveRequest: handleActiveRequest,
   matches: matches

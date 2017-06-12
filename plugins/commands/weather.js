@@ -1,8 +1,10 @@
-const name = ['weather '];
-const description = 'Gets the current conditions and weather forecast for a given location.';
-const usage = '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.';
-const type = CommandType.General;
-const hidden = false;
+const info = {
+  name: ['weather '],
+  description: 'Gets the current conditions for a given location.',
+  usage: '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.',
+  type: CommandType.General,
+  hidden: false
+};
 
 const request = require('request');
 const Discord = require('discord.js');
@@ -422,11 +424,7 @@ const matches = function(input) {
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  usage: usage,
-  type: type,
-  hidden: hidden,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

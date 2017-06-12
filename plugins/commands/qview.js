@@ -1,7 +1,9 @@
-const name = ['q'];
-const description = 'View your playlist.';
-const usage = '`' + config.discriminator + 'q`\n`' + config.discriminator + 'q`';
-const type = CommandType.TTPlaylist;
+const info = {
+  name: ['q'],
+  description: 'View your playlist.',
+  usage: '`' + config.discriminator + 'q`\n`' + config.discriminator + 'q`',
+  type: CommandType.TTPlaylist
+};
 
 const queueHandler = require(global.paths.lib + 'queue-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
@@ -12,14 +14,11 @@ const handleMessage = function(bot, message) {
 };
 
 const matches = function(input) {
-  return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
-  usage: usage,
   matches: matches
 };

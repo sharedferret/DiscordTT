@@ -1,6 +1,8 @@
-const name = ['profile'];
-const description = 'View your profile.';
-const type = CommandType.Profile;
+const info = {
+  name: ['profile'],
+  description: 'View your profile.',
+  type: CommandType.Profile
+};
 
 const tt = require(global.paths.lib + 'turntable-handler');
 const Discord = require('discord.js');
@@ -58,9 +60,7 @@ const matches = function(input) {
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

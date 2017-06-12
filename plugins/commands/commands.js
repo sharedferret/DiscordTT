@@ -1,7 +1,9 @@
-const name = ['help', 'commands'];
-const description = 'Lists the bot\'s available commands.';
-const usage = '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.';
-const type = CommandType.General;
+const info = {
+  name: ['help', 'commands'],
+  description: 'Lists the bot\'s available commands.',
+  usage: '`' + config.discriminator + 'help`: List all commands.\n`' + config.discriminator + 'help [command name]`: Show help page for a specific command.',
+  type: CommandType.General
+};
 
 const Discord = require('discord.js');
 const messageHandler = require(global.paths.lib + 'message-handler');
@@ -14,14 +16,13 @@ const handleMessage = function(bot, message) {
     embed.setTitle('Supported Commands');
     embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + config.discriminator + 'help [command name]`.');
     
-    const sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.type; });
-    console.log('commands', sortedCommands);
+    const sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.info.type; });
 
     for (let commandType in sortedCommands) {
       embed.addField(commandType,
         sortedCommands[commandType]
         .filter(function(i) { return i.hidden !== true; })
-        .map(function(i) { return config.discriminator + (typeof i.name == 'string' ? i.name : i.name[0])})
+        .map(function(i) { return config.discriminator + i.info.name[0]})
         .join('\n'));
     }
 
@@ -41,14 +42,14 @@ const handleMessage = function(bot, message) {
     if (requestedCommand) {
       const embed = new Discord.RichEmbed();
       embed.setAuthor(bot.user.username, bot.user.avatarURL);
-      embed.setTitle(typeof requestedCommand.name == 'string' ? requestedCommand.name : requestedCommand.name[0]);
-      embed.setDescription('_' + (requestedCommand.description ? requestedCommand.description : 'No description available.') + '_');
-      if (requestedCommand.usage) {
-        embed.addField('Usage', requestedCommand.usage);
+      embed.setTitle(requestedCommand.info.name[0]);
+      embed.setDescription('_' + (requestedCommand.info.description ? requestedCommand.info.description : 'No description available.') + '_');
+      if (requestedCommand.info.usage) {
+        embed.addField('Usage', requestedCommand.info.usage);
       }
 
-      if (!(typeof requestedCommand.name == 'string')) {
-        embed.addField('Alternate commands', requestedCommand.name.join(', '));
+      if (requestedCommand.info.name.length > 1) {
+        embed.addField('Alternate commands', requestedCommand.info.name.join(', '));
       }
 
       embed.setThumbnail(bot.user.avatarURL);
@@ -64,14 +65,11 @@ const handleMessage = function(bot, message) {
 };
 
 const matches = function(input) {
-  return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1 || _.startsWith(input, config.discriminator + 'help');
+  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1 || _.startsWith(input, config.discriminator + 'help');
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  usage: usage,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

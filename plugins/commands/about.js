@@ -5,11 +5,6 @@ const info = {
   type: CommandType.General
 };
 
-const name = ['about'];
-const description = 'Find out about Tohru!';
-const usage = '`' + config.discriminator + 'about`: List all commands.';
-const type = CommandType.General;
-
 const Discord = require('discord.js');
 const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
@@ -43,14 +38,11 @@ const handleMessage = function(bot, message) {
 
 // TODO: This fn is used by most handlers, pull into common fn
 const matches = function(input) {
-  return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  usage: usage,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

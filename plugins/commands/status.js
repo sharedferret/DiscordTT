@@ -1,7 +1,9 @@
-const name = ['status'];
-const description = 'Find out about Tohru!';
-const usage = '`' + config.discriminator + 'status`: Show bot vitals.';
-const type = CommandType.Utility;
+const info = {
+  name: ['status'],
+  description: 'Find out about Tohru!',
+  usage: '`' + config.discriminator + 'status`: Show bot vitals.',
+  type: CommandType.Utility
+};
 
 const Discord = require('discord.js');
 const git = require('git-rev');
@@ -41,14 +43,11 @@ const handleMessage = function(bot, message) {
 };
 
 const matches = function(input) {
-  return name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  type: type,
-  usage: usage,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

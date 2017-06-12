@@ -1,7 +1,9 @@
-const name = ['q- ', 'q remove '];
-const description = 'Removes a song from your playlist.';
-const usage = '`' + config.discriminator + 'q remove [queue location]`:\n`' + config.discriminator + 'q- [queue location]:`';
-const type = CommandType.TTPlaylist;
+const info = {
+  name: ['q- ', 'q remove '],
+  description: 'Removes a song from your playlist.',
+  usage: '`' + config.discriminator + 'q remove [queue location]`:\n`' + config.discriminator + 'q- [queue location]:`',
+  type: CommandType.TTPlaylist
+};
 
 const messageHandler = require(global.paths.lib + 'message-handler');
 const queueHandler = require(global.paths.lib + 'queue-handler');
@@ -26,10 +28,7 @@ const matches = function(input) {
 };
 
 module.exports = {
-  name: name,
-  description: description,
-  usage: usage,
-  type: type,
+  info: info,
   handleMessage: handleMessage,
   matches: matches
 };

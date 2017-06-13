@@ -8,6 +8,7 @@ const bot = new Discord.Client();
 const messageHandler = require(global.paths.lib + 'message-handler');
 const hookHandler = require(global.paths.lib + 'hook-handler');
 const databaseHandler = require(global.paths.lib + 'database-handler');
+const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const tt = require(global.paths.lib + 'turntable-handler');
  
 bot.on('message', function(message) {
@@ -30,6 +31,16 @@ bot.on('ready', function(data) {
 
   // Set game to welcome message
   bot.user.setGame('/help');
+
+  // Register any new servers since last startup
+  bot.guilds.every(function(guild) {
+    serverSettingsManager.registerServer(guild.id);
+    serverSettingsManager.loadSettings(guild.id);
+  });
+});
+
+bot.on('guildCreate', function(guild) {
+  serverSettingsManager.registerServer(guild.id);
 });
 
 bot.on('reconnecting', function() {

@@ -20,10 +20,10 @@ const handleMessage = function(bot, message) {
 
     for (let commandType in sortedCommands) {
       embed.addField(commandType,
-        sortedCommands[commandType]
+        '`' + sortedCommands[commandType]
         .filter(function(i) { return i.hidden !== true; })
         .map(function(i) { return config.discriminator + i.info.name[0]})
-        .join('\n'));
+        .join('`, `') + '`');
     }
 
     embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);

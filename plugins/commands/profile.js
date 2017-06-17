@@ -81,9 +81,7 @@ const displayProfileForUser = function(bot, message, user) {
       if (metadata.location.components) {
         if (metadata.location.components.locality) {
           locationString += metadata.location.components.locality + ', ';
-        }
-
-        if (metadata.location.components.postal_town) {
+        } else if (metadata.location.components.postal_town) {
           locationString += metadata.location.components.postal_town + ', ';
         }
 

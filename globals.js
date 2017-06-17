@@ -17,3 +17,4 @@ global.paths = {
 
 global.startTime = new Date();
 global.CommandType = require(global.paths.plugins + 'commandtypes');
+global.Utils = require(global.paths.lib + 'utils');

@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"async": "*",
+		"country-data": "0.0.31",
 		"discord.js": "~11.1.0",
 		"git-rev": "*",
 		"googleapis": "~2.1.7",
@@ -27,11 +28,12 @@
 		"request": "*",
 		"sqlite": "^2.8.0",
 		"sqlite3": "^3.1.8",
+		"tz-lookup": "^6.1.0",
 		"uuid": "*",
 		"ytdl-core": "*"
 	},
 	"scripts": {
 		"start": "node app.js"
 	},
-	"version": "0.3.4"
+	"version": "0.3.5"
 }

@@ -27,7 +27,7 @@ const handleMessage = function(bot, message) {
   }
 
   youtube.search.list({
-    key: config.api.youtube,
+    key: config.api.google,
     part: 'snippet',
     type: 'video',
     maxResults: 3,

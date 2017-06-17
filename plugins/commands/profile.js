@@ -64,44 +64,46 @@ const displayProfileForUser = function(bot, message, user) {
   embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
 
   userHandler.getProfile(message.author.id, function(profile) {
-    if (!profile) return message.reply('I couldn\'t find a profile for that user!');
+    if (!profile || !profile.id) return message.reply('I couldn\'t find a profile for that user!');
     
     const metadata = JSON.parse(profile.metadata);
 
-    if (metadata.description) {
-      embed.setDescription(metadata.description);
-    }
+    if (metadata) {
+      if (metadata.description) {
+        embed.setDescription(metadata.description);
+      }
 
-    // Create Location and Timezone fields
-    if (metadata.location) {
-      const country = countryData.countries[metadata.location.country];
+      // Create Location and Timezone fields
+      if (metadata.location) {
+        const country = countryData.countries[metadata.location.country];
 
-      let locationString = '';
+        let locationString = '';
 
-      if (metadata.location.components) {
-        if (metadata.location.components.locality) {
-          locationString += metadata.location.components.locality + ', ';
-        } else if (metadata.location.components.postal_town) {
-          locationString += metadata.location.components.postal_town + ', ';
+        if (metadata.location.components) {
+          if (metadata.location.components.locality) {
+            locationString += metadata.location.components.locality + ', ';
+          } else if (metadata.location.components.postal_town) {
+            locationString += metadata.location.components.postal_town + ', ';
+          }
+
+          if (metadata.location.components.administrative_area_level_1) {
+            locationString += metadata.location.components.administrative_area_level_1 + ', ';
+          }
         }
 
-        if (metadata.location.components.administrative_area_level_1) {
-          locationString += metadata.location.components.administrative_area_level_1 + ', ';
+        locationString += country.name + ' ' + country.emoji;
+
+        embed.addField('Location', locationString);
+
+        if (metadata.location.timezone) {
+          embed.addField('Time Zone', metadata.location.timezone);
         }
       }
 
-      locationString += country.name + ' ' + country.emoji;
-
-      embed.addField('Location', locationString);
-
-      if (metadata.location.timezone) {
-        embed.addField('Time Zone', metadata.location.timezone);
+      // Create Accounts fields
+      if (metadata.accounts && metadata.accounts.battlenet) {
+        embed.addField('Battle.net Tag', metadata.accounts.battlenet);
       }
-    }
-
-    // Create Accounts fields
-    if (metadata.accounts && metadata.accounts.battlenet) {
-      embed.addField('Battle.net Tag', metadata.accounts.battlenet);
     }
 
     // Create Points field

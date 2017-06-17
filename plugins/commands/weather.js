@@ -10,13 +10,33 @@ const request = require('request');
 const Discord = require('discord.js');
 const moment = require('moment');
 const countryData = require('country-data');
+const userHandler = require(global.paths.lib + 'user-handler');
 
 const handleMessage = function(bot, message) {
-  const searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
+  if (message.content.length <= config.discriminator.length + 8) {
+    userHandler.getProfile(message.author.id, function(profile) {
+      if (profile) {
+        const metadata = JSON.parse(profile.metadata);
 
+        if (metadata && metadata.location && metadata.location.formatted_address) {
+          return retrieveWeather(bot, message, metadata.location.formatted_address);
+        }
+      }
+
+      message.reply('please provide a city to search for.');
+    });
+  } else {
+    const searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
+    retrieveWeather(bot, message, searchParameters);
+  }
+};
+
+const retrieveWeather = function(bot, message, searchParameters) {
   // Form request URL
   // If a US zip is requested, switch API call
   let apiUrl;
+
+  console.log('looking for ' + searchParameters);
 
   if (/^\d{5}(-\d{4})?$/.test(searchParameters)) {
     apiUrl = 'http://api.openweathermap.org/data/2.5/weather?appid=' + config.api.openweathermap + '&zip=' + searchParameters

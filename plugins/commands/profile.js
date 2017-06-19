@@ -63,7 +63,7 @@ const displayProfileForUser = function(bot, message, user) {
   embed.setThumbnail(user.avatarURL);
   embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
 
-  userHandler.getProfile(message.author.id, function(profile) {
+  userHandler.getProfile(user, message.guild.id, function(profile) {
     if (!profile || !profile.id) return message.reply('I couldn\'t find a profile for that user!');
     
     const metadata = JSON.parse(profile.metadata);

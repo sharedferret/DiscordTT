@@ -1,7 +1,8 @@
 const info = {
   name: ['weather '],
   description: 'Gets the current conditions for a given location.',
-  usage: '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.',
+  usage: '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.\n`' + 
+  config.discriminator + 'weather`: This command will use the location saved in your profile.',
   type: CommandType.General,
   hidden: false
 };
@@ -14,7 +15,7 @@ const userHandler = require(global.paths.lib + 'user-handler');
 
 const handleMessage = function(bot, message) {
   if (message.content.length <= config.discriminator.length + 8) {
-    userHandler.getProfile(message.author.id, function(profile) {
+    userHandler.getProfile(message.author, message.guild.id, function(profile) {
       if (profile) {
         const metadata = JSON.parse(profile.metadata);
 

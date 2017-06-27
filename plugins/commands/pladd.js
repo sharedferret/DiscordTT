@@ -21,7 +21,7 @@ const handleMessage = function(bot, message) {
   // If it's a YT playlist link, attempt to load all tracks
   const messageUrl = url.parse(playlistName);
 
-  if (messageUrl.host.indexOf('youtube.com') > -1 && messageUrl.query.indexOf('list=') > -1) {
+  if (messageUrl.host && messageUrl.host.indexOf('youtube.com') > -1 && messageUrl.query && messageUrl.query.indexOf('list=') > -1) {
     const plStart = messageUrl.query.substring(messageUrl.query.indexOf('list='), messageUrl.query.length);
 
     const playlistId = plStart.substring(5, plStart.indexOf('&') > -1 ? plStart.indexOf('&') : plStart.length);

@@ -3,6 +3,9 @@
     "name": "Tohru",
     "script": "./app.js",
     "watch": true,
-    "ignore_watch": ["db.sqlite3", "node_modules"]
+    "ignore_watch": ["db.sqlite3", "node_modules"],
+    "restart_delay": 10000,
+    "min_uptime": 5000,
+    "max_restarts": 5
   }]
 }

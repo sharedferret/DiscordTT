@@ -17,6 +17,8 @@ const userHandler = require(global.paths.lib + 'user-handler');
 const countryData = require('country-data');
 const request = require('request');
 const tzlookup = require('tz-lookup');
+const moment = require('moment');
+require('moment-timezone');
 
 const handleMessage = function(bot, message) {
   if (message.mentions.users.size > 0) {
@@ -96,7 +98,9 @@ const displayProfileForUser = function(bot, message, user) {
         embed.addField('Location', locationString);
 
         if (metadata.location.timezone) {
-          embed.addField('Time Zone', metadata.location.timezone);
+          // embed.addField('Time Zone', metadata.location.timezone);
+          const localTime = moment().tz(metadata.location.timezone);
+          embed.addField('Current Time', localTime.format('MMMM Do, h:mm a') + ' (' + metadata.location.timezone + ')');
         }
       }
 

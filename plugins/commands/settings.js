@@ -54,7 +54,7 @@ const updateGuildSettingsAdmin = function(message, guildId, field, update) {
 }
 
 const displayGuildSettings = function(message, guildId) {
-  const settings = serverSettingsManager.getSettings(message.guild.id);
+  const settings = serverSettingsManager.getSettings(guildId);
 
   if (settings) {
     const embed = new Discord.RichEmbed();

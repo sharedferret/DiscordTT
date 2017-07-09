@@ -36,6 +36,7 @@ bot.on('ready', function(data) {
   bot.guilds.every(function(guild) {
     serverSettingsManager.registerServer(guild.id);
     serverSettingsManager.loadSettings(guild.id);
+    return true;
   });
 });
 

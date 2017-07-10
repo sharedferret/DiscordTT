@@ -173,7 +173,9 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
           locationString += metadata.location.components.postal_town + ', ';
         }
 
-        locationString += country.name;
+        if (metadata.location.components.administrative_area_level_1) {
+          locationString += metadata.location.components.administrative_area_level_1 + ', ';
+        }
       }
 
       embed.setTitle(country.emoji + ' Weather for ' + locationString + ' (' + Utils.formatLatitude(res.latitude) + ', ' + Utils.formatLongitude(res.longitude) + ')');

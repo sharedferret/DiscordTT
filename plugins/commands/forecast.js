@@ -105,6 +105,8 @@ const retrieveForecast = function(bot, message, metadata) {
         if (metadata.location.components.administrative_area_level_1) {
           locationString += metadata.location.components.administrative_area_level_1 + ', ';
         }
+
+        locationString += country.name;
       }
 
       embed.setTitle(country.emoji + ' Forecast for ' + locationString + ' (' + Utils.formatLatitude(res.latitude) + ', ' + Utils.formatLongitude(res.longitude) + ')');

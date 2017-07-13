@@ -26,6 +26,8 @@ const handleMessage = function(bot, message) {
     return message.reply('no results found.');
   }
 
+  // TODO: Auto-add song if a full Youtube URL was provided
+
   youtube.search.list({
     key: config.api.google,
     part: 'snippet',

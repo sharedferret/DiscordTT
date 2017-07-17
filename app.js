@@ -55,11 +55,15 @@ try {
 }
 
 function exitHandler(options, err) {
-
   if (err) console.log(err.stack);
 
+  // Close database connection
+  databaseHandler.closeDb();
+
+  // Disconnect from any active voice channels
   bot.voiceConnections.every(function(i) {
-    return i.disconnect();
+    i.disconnect();
+    return true;
   });
 
   if (options.exit) process.exit();

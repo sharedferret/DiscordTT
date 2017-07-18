@@ -24,23 +24,23 @@ const handleMessage = function(bot, message) {
         // Admin gated
         if (config.admins.indexOf(message.author.id) !== -1) {
           const targetGuild = cmd[2];
-          displayGuildSettings(message, cmd[2]);
+          displayGuildSettings(bot, message, cmd[2]);
         }
         break;
       case 'gupdate':
         if (config.admins.indexOf(message.author.id) !== -1) {
-          updateGuildSettingsAdmin(message, cmd[2], cmd[3], cmd[4]);
+          updateGuildSettingsAdmin(bot, message, cmd[2], cmd[3], cmd[4]);
         }
         break;
       default: break;
     }
   } else {
-    displayGuildSettings(message, message.guild.id);
+    displayGuildSettings(bot, message, message.guild.id);
   }
 };
 
 // TODO: Error handling, pls
-const updateGuildSettingsAdmin = function(message, guildId, field, update) {
+const updateGuildSettingsAdmin = function(bot, message, guildId, field, update) {
   if (!guildId || !field || !update) {
     return message.reply('that is not a valid update.');
   }
@@ -53,17 +53,18 @@ const updateGuildSettingsAdmin = function(message, guildId, field, update) {
   message.reply('the `' + field + '` setting has been updated.');
 }
 
-const displayGuildSettings = function(message, guildId) {
+const displayGuildSettings = function(bot, message, guildId) {
   const settings = serverSettingsManager.getSettings(guildId);
 
   if (settings) {
     const embed = new Discord.RichEmbed();
 
-    embed.setAuthor('Server Settings', message.author.avatarURL);
+    embed.setAuthor('Server Settings', message.guild.iconURL);
     embed.setTimestamp(new Date());
     embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
+    embed.setThumbnail(message.guild.iconURL);
 
-    embed.addField('Guild ID', guildId);
+    embed.addField('Guild', message.guild.name + ' (ID: `' + guildId + '`)');
 
     for (const i of _.keys(settings)) {
       const setting = settings[i];

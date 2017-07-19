@@ -70,10 +70,10 @@ db.serialize(function() {
   
   console.log('- Creating CommandUsage');
   db.run('CREATE TABLE IF NOT EXISTS CommandUsage(' +
-    'commandName TEXT, ' +
-    'guildId TEXT, ' +
-    'date DATETIME, ' +
-    'count INTEGER, ' +
+    'commandName TEXT NOT NULL, ' +
+    'guildId TEXT NOT NULL, ' +
+    'date DATETIME NOT NULL, ' +
+    'count INTEGER NOT NULL DEFAULT 1, ' +
     'PRIMARY KEY(commandName, guildId, date))');
 });
 

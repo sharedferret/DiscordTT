@@ -1,6 +1,7 @@
-config.json
-process.json
-db.sqlite3
-node_modules/
-db.sqlite3-journal
 assets/
+config.json
+db.sqlite3
+db.sqlite3-journal
+node_modules/
+npm-debug.log
+process.json

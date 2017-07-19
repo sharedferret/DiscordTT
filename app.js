@@ -9,10 +9,16 @@ const messageHandler = require(global.paths.lib + 'message-handler');
 const hookHandler = require(global.paths.lib + 'hook-handler');
 const databaseHandler = require(global.paths.lib + 'database-handler');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
+const userHandler = require(global.paths.lib + 'user-handler');
 require(global.paths.lib + 'turntable-handler');
 
 bot.on('message', function(message) {
   messageHandler.handleMessage(bot, message);
+
+  // Add a chatMessage point (bots can't earn points)
+  if (!message.author.bot) {
+    userHandler.addPoints(message.author.id, { chatMessage: 1 });
+  }
 });
 
 bot.on('ready', function(data) { // jshint ignore:line
@@ -33,11 +39,15 @@ bot.on('ready', function(data) { // jshint ignore:line
   bot.user.setGame('/help');
 
   // Register any new servers since last startup
-  bot.guilds.every(function(guild) {
+  for (const [ guildId, guild ] of bot.guilds) {
     serverSettingsManager.registerServer(guild.id);
     serverSettingsManager.loadSettings(guild.id);
-    return true;
-  });
+
+    // Create database entries for new users
+    for (const [ userId, user ] of guild.members) {
+      userHandler.createUser(user.user, guild.id);
+    }
+  };
 });
 
 bot.on('guildCreate', function(guild) {

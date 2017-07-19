@@ -111,8 +111,17 @@ const displayProfileForUser = function(bot, message, user) {
     }
 
     // Create Points field
-    embed.addField('Points', ':pound: 0\t:cd: ' + profile.points + '\t:star: Lv0', true);
+    const userLevel = Utils.calculateUserLevel(profile.userPoints);
+    // embed.addField('Points', `:pound: 0\t:cd: ${profile.points} \t:star: Level ${userLevel.level} (${userLevel.points} pts)`, true);
     
+    // embed.addField('Level', `:star: Level ${userLevel.level} (${userLevel.points} pts)`, true);
+    // embed.addField('DJ Points', `:cd: ${profile.points}`, true);
+    // embed.addField('Money', ':pound: 0', true);
+
+    embed.addField('Points', `:star: Level ${userLevel.level} (${userLevel.points} pts)\t:cd: ${profile.points}`);
+    
+    embed.addField('Money', ':pound: 0');
+
     message.channel.send('', { embed: embed });
   });
 }

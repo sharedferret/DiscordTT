@@ -56,7 +56,25 @@ db.serialize(function() {
     'id TEXT PRIMARY KEY, ' +
     'userId TEXT NOT NULL, ' +
     'name TEXT, ' +
-    'metadata TEXT)');
+    'metadata TEXT, ' +
+    'UNIQUE(userId, name))');
+
+  console.log('- Creating UserPoints');
+  db.run('CREATE TABLE IF NOT EXISTS UserPoints(' +
+    'userId TEXT PRIMARY KEY, '
+    + 'chatMessage INTEGER NOT NULL DEFAULT 0, ' +
+    'botCommand INTEGER NOT NULL DEFAULT 0, ' +
+    'songPlay INTEGER NOT NULL DEFAULT 0, ' +
+    'songVote INTEGER NOT NULL DEFAULT 0, ' +
+    'songPointEarned INTEGER NOT NULL DEFAULT 0)');
+  
+  console.log('- Creating CommandUsage');
+  db.run('CREATE TABLE IF NOT EXISTS CommandUsage(' +
+    'commandName TEXT, ' +
+    'guildId TEXT, ' +
+    'date DATETIME, ' +
+    'count INTEGER, ' +
+    'PRIMARY KEY(commandName, guildId, date))');
 });
 
 db.close();

@@ -79,7 +79,7 @@ const displayProfileForUser = function(bot, message, user) {
       if (metadata.location) {
         const country = countryData.countries[metadata.location.country];
 
-        let locationString = '';
+        let locationString = country.emoji + ' ';
 
         if (metadata.location.components) {
           if (metadata.location.components.locality) {
@@ -93,7 +93,7 @@ const displayProfileForUser = function(bot, message, user) {
           }
         }
 
-        locationString += country.name + ' ' + country.emoji;
+        locationString += country.name;
 
         embed.addField('Location', locationString);
 

@@ -118,9 +118,9 @@ const displayProfileForUser = function(bot, message, user) {
     // embed.addField('DJ Points', `:cd: ${profile.points}`, true);
     // embed.addField('Money', ':pound: 0', true);
 
-    embed.addField('Points', `:star: Level ${userLevel.level} (${userLevel.points} pts)\t:cd: ${profile.points}`);
+    embed.addField('Points', `:star: Level ${userLevel.level} (${userLevel.points} pts)\t:cd: ${profile.points}`, true);
     
-    embed.addField('Money', ':pound: 0');
+    embed.addField('Money', ':pound: 0', true);
 
     message.channel.send('', { embed: embed });
   });

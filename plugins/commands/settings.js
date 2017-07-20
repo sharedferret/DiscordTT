@@ -19,6 +19,7 @@ const handleMessage = function(bot, message) {
 
     switch(cmd[1]) {
       case 'update':
+        message.reply('this command is not yet implemented.');
         break;
       case 'view':
         // Admin gated
@@ -35,6 +36,10 @@ const handleMessage = function(bot, message) {
       default: break;
     }
   } else {
+    if (!message.guild) {
+      return message.reply('This command can only be used on a server, not via DM.');
+    }
+
     displayGuildSettings(bot, message, message.guild.id);
   }
 };

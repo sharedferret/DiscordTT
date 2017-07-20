@@ -1,7 +1,7 @@
 const info = {
   name: ['pl add '],
-  description: 'Add a new playlist.',
-  usage: '`' + config.discriminator + 'pl add [playlist name]`',
+  description: 'Create a new playlist. Can also create a new playlist from a Youtube Playlist URL.',
+  usage: '`' + config.discriminator + 'pl add [playlist name]\npl add [Youtube Playlist URL]`',
   type: CommandType.TTPlaylist
 };
 

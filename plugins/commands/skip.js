@@ -7,6 +7,10 @@ const info = {
 const tt = require(global.paths.lib + 'turntable-handler');
 
 const handleMessage = function(bot, message) {
+  if (!message.guild) {
+    return message.reply('This command can only be used on a server, not via DM.');
+  }
+  
   tt.skipSong(message.guild.id);
 };
 

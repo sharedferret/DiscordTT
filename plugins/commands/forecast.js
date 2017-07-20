@@ -19,16 +19,16 @@ const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 
 const handleMessage = function(bot, message) {
-  const serverSettings = serverSettingsManager.getSettings(message.guild.id);
-
-  if (serverSettings.weather && serverSettings.weather.enabled == 'true' && serverSettings.weather.source == 'DarkSky') {
+  if (requestIsEligible(message)) {
     if (message.content.length <= config.discriminator.length + 9) {
-      userHandler.getProfile(message.author, message.guild.id, function(profile) {
+      userHandler.getProfile(message.author, null, function(profile) {
         if (profile) {
           const metadata = JSON.parse(profile.metadata);
 
           if (metadata && metadata.location) {
             retrieveForecast(bot, message, metadata);
+          } else {
+            message.reply('your profile doesn\'t have a location. Set one by typing `' + config.discriminator + 'profile set location YOUR_LOCATION`.');
           }
         } else {
           message.reply('please provide a city to search for.');
@@ -171,7 +171,16 @@ const retrieveForecast = function(bot, message, metadata) {
     .catch(err => {
       console.warn('Error while retrieving Dark Sky response', err);
     })
-}
+};
+
+const requestIsEligible = function(message) {
+  if (!message.guild) {
+    return true;
+  }
+
+  const serverSettings = serverSettingsManager.getSettings(message.guild.id);
+  return serverSettings.weather && serverSettings.weather.enabled === 'true' && serverSettings.weather.source === 'DarkSky';
+};
 
 const matches = function(input) {
   return _.startsWith(input, config.discriminator + 'forecast ') || input == config.discriminator + 'forecast';

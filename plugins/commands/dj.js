@@ -9,7 +9,12 @@ const info = {
 const tt = require(global.paths.lib + 'turntable-handler');
 
 const handleMessage = function(bot, message) {
-  tt.addDj(bot, message);
+  if (message.guild) {
+    tt.addDj(bot, message);
+  } else {
+    message.reply('This command can only be used on a server, not via DM.');
+  }
+  
 };
 
 const matches = function(input) {

@@ -21,7 +21,7 @@ const serverSettingsManager = require(global.paths.lib + 'server-settings-manage
 
 const handleMessage = function(bot, message) {
   if (message.content.length <= config.discriminator.length + 8) {
-    userHandler.getProfile(message.author, message.guild.id, function(profile) {
+    userHandler.getProfile(message.author, message.guild ? message.guild.id : null, function(profile) {
       if (profile) {
         const metadata = JSON.parse(profile.metadata);
 
@@ -241,7 +241,7 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
     .catch(err => {
       console.warn('Error while retrieving DarkSky response', err);
     });
-}
+};
 
 const matches = function(input) {
   return _.startsWith(input, config.discriminator + 'weather ') || input == config.discriminator + 'weather';

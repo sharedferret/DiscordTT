@@ -1,7 +1,7 @@
 const info = {
   name: ['playlists', 'pl'],
   description: 'View your playlists.',
-  usage: '`' + config.discriminator + 'playlists`',
+  usage: '`' + config.discriminator + 'playlists`\n`' + config.discriminator + 'pl`',
   type: CommandType.TTPlaylist
 };
 

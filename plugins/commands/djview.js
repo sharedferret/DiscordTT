@@ -9,6 +9,10 @@ const Discord = require('discord.js');
 const db = require(global.paths.lib + 'database-handler').db;
 
 const handleMessage = function(bot, message) {
+  if (!message.guild) {
+    return message.reply('This command can only be used on a server, not via DM.');
+  }
+
   const embed = new Discord.RichEmbed();
 
   embed.setAuthor('Current DJs', bot.user.avatarURL);

@@ -102,12 +102,16 @@ const displayProfileForUser = function(bot, message, user) {
           const localTime = moment().tz(metadata.location.timezone);
           embed.addField('Current Time', localTime.format('MMMM Do, h:mm a') + ' (' + metadata.location.timezone + ')');
         }
+      } else {
+        embed.addField('Location', '_No location set._');
       }
 
       // Create Accounts fields
       if (metadata.accounts && metadata.accounts.battlenet) {
         embed.addField('Battle.net Tag', metadata.accounts.battlenet);
       }
+    } else {
+      embed.addField('Location', '_No location set._');
     }
 
     // Create Points field

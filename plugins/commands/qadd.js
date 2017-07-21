@@ -12,6 +12,7 @@ const google = require('googleapis');
 const youtube = google.youtube('v3');
 const Discord = require('discord.js');
 const uuid = require('uuid/v4');
+const url = require('url');
 
 const handleMessage = function(bot, message) {
   let searchParameters = '';
@@ -27,6 +28,13 @@ const handleMessage = function(bot, message) {
   }
 
   // TODO: Auto-add song if a full Youtube URL was provided
+  const messageUrl = url.parse(searchParameters);
+
+  if (messageUrl.host && messageUrl.host.indexOf('youtube.com') > -1 && messageUrl.query && messageUrl.query.indexOf('v=') > -1) {
+    const vStart = messageUrl.query.substring(messageUrl.query.indexOf('v='), messageUrl.query.length);
+    const videoId = vStart.substring(2, vStart.indexOf('&') > 1 ? vStart.indexOf('&') : vStart.length);
+    return addYoutubeVideo(bot, message, videoId);
+  }
 
   youtube.search.list({
     key: config.api.google,
@@ -37,7 +45,7 @@ const handleMessage = function(bot, message) {
   }, function(error, response) {
     if (error) {
       console.warn('An error occurred while searching YouTube', error);
-      return message.reply('I was unable to find matching songs for your request.');
+      return message.reply('I couldn\'t fetch Youtube videos for your request. Please try again later.');
     }
 
     if (response.items[0]) {
@@ -79,6 +87,8 @@ const handleMessage = function(bot, message) {
       setTimeout(requestHandler.bind(this, id), 10000);
 
       message.channel.send('', { embed: embed });
+    } else {
+      return message.reply('I was unable to find matching songs for your request.');
     }
   });
 };
@@ -103,6 +113,24 @@ const handleActiveRequest = function(bot, message, request) {
       messageHandler.removeRequest(request.id);
     }
   }
+};
+
+const addYoutubeVideo = function(bot, message, videoId) {
+  youtube.videos.list({
+    key: config.api.google,
+    part: 'snippet,contentDetails',
+    type: 'video',
+    id: videoId
+  }, function(error, response) {
+    if (error) {
+      console.warn('An error occurred while searching YouTube', error);
+      return message.reply('I couldn\'t fetch the Youtube video for your request. Please try again later.');
+    }
+
+    if (response.items[0]) {
+      queueHandler.queueSong(bot, message, response.items[0]);
+    }
+  });
 };
 
 module.exports = {

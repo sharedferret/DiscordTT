@@ -19,6 +19,7 @@
 		"discord.js": "~11.1.0",
 		"git-rev": "*",
 		"googleapis": "~19.0.0",
+		"html-to-text": "^3.3.0",
 		"humanize": "*",
 		"lodash": "~4.3.0",
 		"moment": "*",
@@ -33,6 +34,7 @@
 		"sqlite3": "^3.1.8",
 		"tz-lookup": "^6.1.0",
 		"uuid": "*",
+		"xml2js": "^0.4.17",
 		"ytdl-core": "*"
 	},
 	"devDependencies": {

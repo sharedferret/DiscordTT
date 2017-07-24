@@ -18,7 +18,7 @@ const handleMessage = function(bot, message) {
   const url = new URL('https://www.redditbooru.com/images/');
   if (searchParameters) url.searchParams.append('q', searchParameters);
   url.searchParams.append('sources', '1,44,50,61,38,28,43,21,47,13,41,26,20,7,46,48,15,62,33,30,17,55,35,19,32,34,23');
-  url.searchParams.append('limit', '10');
+  url.searchParams.append('limit', '20');
 
   request(url.href, function(err, response, body) {
     if (err) {

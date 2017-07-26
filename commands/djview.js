@@ -1,14 +1,8 @@
-const info = {
-  name: ['djs', 'view'],
-  description: 'View DJs',
-  type: CommandType.TTMusic
-};
-
 const tt = require(global.paths.lib + 'turntable-handler');
 const Discord = require('discord.js');
 const db = require(global.paths.lib + 'database-handler').db;
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   if (!message.guild) {
     return message.reply('This command can only be used on a server, not via DM.');
   }
@@ -49,12 +43,21 @@ const handleMessage = function(bot, message) {
   }
 };
 
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+const info = {
+  name: ['djs', 'view'],
+  description: 'View DJs',
+  type: CommandType.TTMusic,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '': 'View active DJs.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

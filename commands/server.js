@@ -1,14 +1,7 @@
-const info = {
-  name: ['server'],
-  description: 'View information about this server.',
-  usage: config.discriminator + 'settings: View information about your guild.',
-  type: CommandType.Utility
-};
-
 const Discord = require('discord.js');
 const moment = require('moment');
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   if (!message.guild) {
     return message.reply('This command can only be used on a server, not via DM.');
   }
@@ -70,6 +63,7 @@ const handleMessage = function(bot, message) {
   embed.addField('AFK Channel', guild.channels.get(guild.afkChannelID).name + ' (Timeout: ' + (guild.afkTimeout / 60) + ' minutes)', true);
   // embed.addField('Used Tohru Since', moment(guild.joinedTimestamp).format('dddd, MMMM Do YYYY'), true);
 
+  // TODO: Too many roles/channels causes a Discord length exception
   let roleArray = [];
   for (const [id, role] of guild.roles) {
     if (role.name != '@everyone') {
@@ -117,12 +111,21 @@ const handleMessage = function(bot, message) {
   message.channel.send('', { embed: embed });
 };
 
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+const info = {
+  name: ['server'],
+  description: 'View information about this server.',
+  type: CommandType.Utility,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '': 'View information about your guild.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

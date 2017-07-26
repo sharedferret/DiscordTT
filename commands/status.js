@@ -1,10 +1,3 @@
-const info = {
-  name: ['status'],
-  description: 'Find out about Tohru!',
-  usage: '`' + config.discriminator + 'status`: Show bot vitals.',
-  type: CommandType.Utility
-};
-
 const Discord = require('discord.js');
 const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
@@ -13,7 +6,7 @@ const humanize = require('humanize');
 const tt = require(global.paths.lib + 'turntable-handler');
 require('moment-precise-range-plugin');
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   const embed = new Discord.RichEmbed();
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
@@ -42,12 +35,21 @@ const handleMessage = function(bot, message) {
   message.channel.send('', { embed: embed });
 };
 
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+const info = {
+  name: ['status'],
+  description: 'Find out about Tohru!',
+  type: CommandType.Utility,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '': 'Show bot vitals.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

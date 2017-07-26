@@ -1,12 +1,3 @@
-const info = {
-  name: ['weather '],
-  description: 'Gets the current conditions for a given location.',
-  usage: '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.\n`' + 
-  config.discriminator + 'weather`: This command will use the location saved in your profile.',
-  type: CommandType.General,
-  hidden: false
-};
-
 const request = require('request');
 const Discord = require('discord.js');
 const moment = require('moment');
@@ -19,8 +10,10 @@ const gmapsClient = require('@google/maps').createClient({ key: config.api.googl
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 
-const handleMessage = function(bot, message) {
-  if (message.content.length <= config.discriminator.length + 8) {
+const handleMessage = function(bot, message, input) {
+  if (input.input) {
+    retrieveWeather(bot, message, input.input, null);
+  } else {
     userHandler.getProfile(message.author, message.guild ? message.guild.id : null, function(profile) {
       if (profile) {
         const metadata = JSON.parse(profile.metadata);
@@ -32,10 +25,6 @@ const handleMessage = function(bot, message) {
 
       message.reply('please provide a city to search for.');
     });
-  } else {
-    const searchParameters = message.content.substring(config.discriminator.length + 8, message.content.length);
-
-    retrieveWeather(bot, message, searchParameters, null);
   }
 };
 
@@ -202,8 +191,7 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
       if (res.currently.uvIndex) {
         embed.addField('UV Index', res.currently.uvIndex, true);
       }
-
-      // TODO: Alerts
+      
       if (res.alerts) {
         let alertText = '';
 
@@ -243,12 +231,22 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
     });
 };
 
-const matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'weather ') || input == config.discriminator + 'weather';
+const info = {
+  name: ['weather', 'wx'],
+  description: 'Gets the current conditions for a given location.',
+  type: CommandType.General,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '[location]': 'This command accepts most location identifiers, including town names and postcodes.',
+        '': 'This command will use the location saved in your profile.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

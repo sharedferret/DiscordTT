@@ -1,20 +1,15 @@
-const info = {
-  name: ['anime '],
-  description: 'Anime search.',
-  usage: '`' + config.discriminator + '`anime [search string]: Search for and display information about an anime.',
-  type: CommandType.General
-};
-
 const Discord = require('discord.js');
 const request = require('request');
 const xml2js = require('xml2js');
 const htmltotext = require('html-to-text');
 
-const handleMessage = function(bot, message) {
-  const searchString = message.content.substring(config.discriminator.length + 6, message.content.length);
-  
+const handleMessage = function(bot, message, input) {
+  if (!input.input) {
+    return message.reply('please provide an anime title to search for.');
+  }
+
   // searchWithKitsu(bot, message, searchString);
-  searchWithMal(bot, message, searchString);
+  searchWithMal(bot, message, input.input);
 };
 
 const searchWithKitsu = function(bot, message, searchString) {
@@ -145,12 +140,20 @@ const respondWithMalOutput = function(message, result, searchString) {
     });
 };
 
-const matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'anime');
+const info = {
+  name: ['anime'],
+  description: 'Searches MyAnimeList for anime information.',
+  type: CommandType.General,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '[search string]': 'Search for and display information about an anime.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

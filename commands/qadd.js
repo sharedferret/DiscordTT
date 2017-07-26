@@ -1,10 +1,3 @@
-const info = {
-  name: ['q+ ', 'q add '],
-  description: 'Adds a song to your playlist.',
-  usage: '`' + config.discriminator + 'q+ [song name or YouTube ID]`\n`' + config.discriminator + 'q add [song name or YouTube ID]`',
-  type: CommandType.TTPlaylist
-};
-
 const messageHandler = require(global.paths.lib + 'message-handler');
 const queueHandler = require(global.paths.lib + 'queue-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
@@ -14,14 +7,8 @@ const Discord = require('discord.js');
 const uuid = require('uuid/v4');
 const url = require('url');
 
-const handleMessage = function(bot, message) {
-  let searchParameters = '';
-
-  if (message.content.startsWith(config.discriminator + 'q+')) {
-    searchParameters = message.content.substring(config.discriminator.length + 3, message.content.length);
-  } else {
-    searchParameters = message.content.substring(config.discriminator.length + 6, message.content.length);
-  }
+const handleMessage = function(bot, message, input) {
+  const searchParameters = input.input;
 
   if (searchParameters == '') {
     return message.reply('no results found.');
@@ -93,11 +80,6 @@ const handleMessage = function(bot, message) {
   });
 };
 
-const matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'q add') || 
-    _.startsWith(input, config.discriminator + 'q+');
-};
-
 const handleActiveRequest = function(bot, message, request) {
   console.log('handling request from queue');
 
@@ -133,9 +115,24 @@ const addYoutubeVideo = function(bot, message, videoId) {
   });
 };
 
+const info = {
+  name: ['q+'],
+  description: 'Adds a song to your current playlist\'s queue.',
+  type: CommandType.TTPlaylist,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '[song name]': 'Searches Youtube for the given song title, then adds the result to your queue.',
+        '[Youtube Video URL]': 'Adds the given Youtube video to your queue.'
+      }
+    }
+  }
+};
+
 module.exports = {
   info: info,
-  handleMessage: handleMessage,
   handleActiveRequest: handleActiveRequest,
-  matches: matches
+  handleMessage: handleMessage
 };

@@ -1,12 +1,3 @@
-const info = {
-  name: ['forecast '],
-  description: 'Gets the forecast for a given location.',
-  usage: '`' + config.discriminator + 'weather [location]`: This command accepts most location identifiers, including town names and postcodes.\n`' + 
-  config.discriminator + 'weather`: This command will use the location saved in your profile.',
-  type: CommandType.General,
-  hidden: false
-};
-
 const Discord = require('discord.js');
 const moment = require('moment');
 require('moment-timezone');
@@ -18,24 +9,10 @@ const gmapsClient = require('@google/maps').createClient({ key: config.api.googl
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   if (requestIsEligible(message)) {
-    if (message.content.length <= config.discriminator.length + 9) {
-      userHandler.getProfile(message.author, null, function(profile) {
-        if (profile) {
-          const metadata = JSON.parse(profile.metadata);
-
-          if (metadata && metadata.location) {
-            retrieveForecast(bot, message, metadata);
-          } else {
-            message.reply('your profile doesn\'t have a location. Set one by typing `' + config.discriminator + 'profile set location YOUR_LOCATION`.');
-          }
-        } else {
-          message.reply('please provide a city to search for.');
-        }
-      });
-    } else {
-      const searchParameters = message.content.substring(config.discriminator.length + 9, message.content.length);
+    if (input.input) {
+      const searchParameters = input.input;
 
       if (global.locationCache[searchParameters]) {
         retrieveForecast(bot, message, global.locationCache[searchParameters]);
@@ -76,6 +53,20 @@ const handleMessage = function(bot, message) {
           retrieveForecast(bot, message, metadata);
         });
       }
+    } else {
+      userHandler.getProfile(message.author, null, function(profile) {
+        if (profile) {
+          const metadata = JSON.parse(profile.metadata);
+
+          if (metadata && metadata.location) {
+            retrieveForecast(bot, message, metadata);
+          } else {
+            message.reply('your profile doesn\'t have a location. Set one by typing `' + config.discriminator + 'profile set location YOUR_LOCATION`.');
+          }
+        } else {
+          message.reply('please provide a city to search for.');
+        }
+      });
     }
   } else {
     message.reply('this command is not enabled on this server.');
@@ -182,12 +173,22 @@ const requestIsEligible = function(message) {
   return serverSettings.weather && serverSettings.weather.enabled === 'true' && serverSettings.weather.source === 'DarkSky';
 };
 
-const matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'forecast ') || input == config.discriminator + 'forecast';
+const info = {
+  name: ['forecast'],
+  description: 'Gets the forecast for a given location.',
+  type: CommandType.General,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '[location]': 'This command accepts most location identifiers, including town names and postcodes.',
+        '': 'This command will use the location saved in your profile.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

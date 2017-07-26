@@ -1,15 +1,8 @@
-const info = {
-  name: ['about'],
-  description: 'Find out about Tohru!',
-  usage: '`' + config.discriminator + 'about`: List all commands.',
-  type: CommandType.General
-};
-
 const Discord = require('discord.js');
 const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   const embed = new Discord.RichEmbed();
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
@@ -36,13 +29,18 @@ const handleMessage = function(bot, message) {
   });
 };
 
-// TODO: This fn is used by most handlers, pull into common fn
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+const info = {
+  name: ['about'],
+  description: 'Find out about Tohru!',
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: 'List all commands.'
+    }
+  },
+  type: CommandType.General
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

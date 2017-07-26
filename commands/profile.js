@@ -1,15 +1,3 @@
-const info = {
-  name: ['profile'],
-  description: 'View your profile.',
-  usage: config.discriminator + 'profile: View your profile\n' +
-    config.discriminator + 'profile @[user]: View another user\'s profile.\n' +
-    config.discriminator + 'profile set location [location]: Set your location.\n' +
-    config.discriminator + 'profile set country [country emoji]: Set your country.\n' +
-    config.discriminator + 'profile set description [description]: Add a profile description.\n' +
-    config.discriminator + 'profile set battletag [Battle.net tag]: Set your Blizzard Battletag.',
-  type: CommandType.Profile
-};
-
 const tt = require(global.paths.lib + 'turntable-handler');
 const Discord = require('discord.js');
 const db = require(global.paths.lib + 'database-handler').db;
@@ -19,6 +7,18 @@ const request = require('request');
 const tzlookup = require('tz-lookup');
 const moment = require('moment');
 require('moment-timezone');
+
+
+const displayProfile = function(bot, message, input) {
+  if (message.mentions.users.size > 0) {
+    displayProfileForUser(bot, message, message.mentions.users.first());
+  } else if (input.input) {
+    // TODO: Implement
+    displayProfileForUser(bot, message, message.author);
+  } else {
+    displayProfileForUser(bot, message, message.author);
+  }
+}
 
 const handleMessage = function(bot, message) {
   if (message.mentions.users.size > 0) {
@@ -130,7 +130,9 @@ const displayProfileForUser = function(bot, message, user) {
   });
 }
 
-const profileSetCountry = function(bot, message, country) {
+const profileSetCountry = function(bot, message, input) {
+  const country = input.input;
+
   // First, try lookup by emoji
   let dataForCountry = countryData.lookup.countries({ emoji: country })[0];
 
@@ -152,7 +154,9 @@ const profileSetCountry = function(bot, message, country) {
   });
 };
 
-const profileSetLocation = function(bot, message, inputLocation) {
+const profileSetLocation = function(bot, message, input) {
+  const inputLocation = input.input;
+
   const apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(inputLocation) + '&key=' + config.api.google;
 
   request(apiUrl, function(error, response, body) {
@@ -189,25 +193,68 @@ const profileSetLocation = function(bot, message, inputLocation) {
   });
 };
 
-const profileSetBattletag = function(bot, message, tag) {
+const profileSetBattletag = function(bot, message, input) {
+  const tag = input.input;
+
   // TODO: Validate btag
   userHandler.updateProfileData(message.author.id, 
     { 'accounts.battlenet': tag });
   message.reply('I\'ve added `' + tag + '` to your profile.');
 };
 
-const profileSetDescription = function(bot, message, description) {
+const profileSetDescription = function(bot, message, input) {
+  const description = input.input;
+  
   userHandler.updateProfileData(message.author.id,
     { 'description': description });
   message.reply('I\'ve updated your description.');
 };
 
-const matches = function(input) {
-  return _.startsWith(input, config.discriminator + 'profile');
+const info = {
+  name: ['profile'],
+  description: 'View your profile.',
+  type: CommandType.Profile,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: displayProfile,
+      usage: {
+        '': 'View your profile.',
+        '@[user]': 'View another user\'s profile by tag.',
+//        '[user:####]': 'View another user\'s profile by username and Discord hash.'
+      }
+    },
+    'set location': {
+      handler: profileSetLocation,
+      usage: {
+        '[location]': 'Set your location.'
+      }
+    },
+    'set country': {
+      handler: profileSetCountry,
+      usage: {
+        '[country emoji]': 'Set your country.'
+      }
+    },
+    'set description': {
+      handler: profileSetDescription,
+      usage: {
+        '[description]': 'Add a profile description.'
+      }
+    },
+    'set battletag': {
+      handler: profileSetBattletag,
+      usage: {
+        '[Battle.net tag]': 'Set your Blizzard battletag.'
+      }
+    }
+  },
+  examples: [
+    'profile set location Seattle, WA',
+    'profile @Tohru'
+  ]
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

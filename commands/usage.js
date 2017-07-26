@@ -1,15 +1,8 @@
-const info = {
-  name: ['usage'],
-  description: 'Shows the most common commands used recently.',
-  usage: '`' + config.discriminator + 'usage`: Show command popularity.',
-  type: CommandType.Utility
-};
-
 const Discord = require('discord.js');
 const moment = require('moment');
 const db = require(global.paths.lib + 'database-handler').db;
 
-const handleMessage = function(bot, message) {
+const handleMessage = function(bot, message, input) {
   const embed = new Discord.RichEmbed();
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
 
@@ -33,12 +26,21 @@ const handleMessage = function(bot, message) {
   });
 };
 
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1;
+const info = {
+  name: ['usage'],
+  description: 'Shows the most common commands used recently.',
+  type: CommandType.Utility,
+  hidden: false,
+  operations: {
+    _default: {
+      handler: handleMessage,
+      usage: {
+        '': 'Show command popularity.'
+      }
+    }
+  }
 };
 
 module.exports = {
-  info: info,
-  handleMessage: handleMessage,
-  matches: matches
+  info: info
 };

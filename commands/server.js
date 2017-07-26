@@ -79,7 +79,7 @@ const handleMessage = function(bot, message, input) {
   const roles = _.compact(_.flatten(roleArray));
   let roleText = roles.join(', ');
 
-  if (roleText.length < MESSAGE_CHARACTER_LIMIT) {
+  if (roleText.length > MESSAGE_CHARACTER_LIMIT) {
     roleText = roleText.substring(0, MESSAGE_CHARACTER_LIMIT);
     roleText = roleText.substring(0, roleText.lastIndexOf(','));
     roleText += '...';
@@ -109,7 +109,7 @@ const handleMessage = function(bot, message, input) {
 
   let textChannelsText = textChannels.join(', ');
 
-  if (textChannelsText.length < MESSAGE_CHARACTER_LIMIT) {
+  if (textChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
     textChannelsText = textChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
     textChannelsText = textChannelsText.substring(0, textChannelsText.lastIndexOf(','));
     textChannelsText += '...';
@@ -117,7 +117,7 @@ const handleMessage = function(bot, message, input) {
 
   let voiceChannelsText = voiceChannels.join(', ');
 
-  if (voiceChannelsText.length < MESSAGE_CHARACTER_LIMIT) {
+  if (voiceChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
     voiceChannelsText = voiceChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
     voiceChannelsText = voiceChannelsText.substring(0, voiceChannelsText.lastIndexOf(','));
     voiceChannelsText += '...';

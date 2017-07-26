@@ -131,7 +131,15 @@ const handleMessage = function(bot, message, input) {
     emojiArray.push('<:' + emoji.name + ':' + id + '>');
   }
 
-  embed.addField('Custom Emoji', emojiArray.join(' '));
+  let emojiText = emojiArray.join(', ');
+
+  if (emojiText.length > MESSAGE_CHARACTER_LIMIT) {
+    emojiText = emojiText.substring(0, MESSAGE_CHARACTER_LIMIT);
+    emojiText = emojiText.substring(0, emojiText.lastIndexOf(' '));
+    emojiText += '...';
+  }
+
+  embed.addField('Custom Emoji', emojiText);
 
   message.channel.send('', { embed: embed });
 };

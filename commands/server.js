@@ -110,7 +110,7 @@ const handleMessage = function(bot, message, input) {
   let textChannelsText = textChannels.join(', ');
 
   if (textChannelsText.length < MESSAGE_CHARACTER_LIMIT) {
-    textChannelsText = roletextChannelsTextText.substring(0, MESSAGE_CHARACTER_LIMIT);
+    textChannelsText = textChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
     textChannelsText = textChannelsText.substring(0, textChannelsText.lastIndexOf(','));
     textChannelsText += '...';
   }

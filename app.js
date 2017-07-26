@@ -32,9 +32,6 @@ bot.on('ready', function(data) { // jshint ignore:line
   // Load commands
   messageHandler.loadCommands();
 
-  // Load hooks
-  hookHandler.loadHooks(bot);
-
   // Set game to welcome message
   bot.user.setGame('/help');
 

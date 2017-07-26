@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const moment = require('moment');
 
+const MESSAGE_CHARACTER_LIMIT = 1020;
+
 const handleMessage = function(bot, message, input) {
   if (!message.guild) {
     return message.reply('This command can only be used on a server, not via DM.');
@@ -20,7 +22,7 @@ const handleMessage = function(bot, message, input) {
   embed.addField('Members', guild.memberCount, true);
 
   let guildText = guild.region;
-  switch(guild.region) {
+  switch (guild.region) {
     case 'eu-west':
       guildText = ':flag_eu: Western Europe';
       break;
@@ -75,8 +77,15 @@ const handleMessage = function(bot, message, input) {
   }
 
   const roles = _.compact(_.flatten(roleArray));
+  let roleText = roles.join(', ');
 
-  embed.addField('Roles (' + roles.length + ')', roles.join(', '));
+  if (roleText.length < MESSAGE_CHARACTER_LIMIT) {
+    roleText = roleText.substring(0, MESSAGE_CHARACTER_LIMIT);
+    roleText = roleText.substring(0, roleText.lastIndexOf(','));
+    roleText += '...';
+  }
+
+  embed.addField('Roles (' + roles.length + ')', roleText);
 
   let textChannelArray = [];
   let voiceChannelArray = [];
@@ -98,8 +107,24 @@ const handleMessage = function(bot, message, input) {
   const textChannels = _.compact(_.flatten(textChannelArray));
   const voiceChannels = _.compact(_.flatten(voiceChannelArray));
 
-  embed.addField('Text Channels (' + textChannels.length + ')', textChannels.join(', '));
-  embed.addField('Voice Channels (' + voiceChannels.length + ')', voiceChannels.join(', '));
+  let textChannelsText = textChannels.join(', ');
+
+  if (textChannelsText.length < MESSAGE_CHARACTER_LIMIT) {
+    textChannelsText = roletextChannelsTextText.substring(0, MESSAGE_CHARACTER_LIMIT);
+    textChannelsText = textChannelsText.substring(0, textChannelsText.lastIndexOf(','));
+    textChannelsText += '...';
+  }
+
+  let voiceChannelsText = voiceChannels.join(', ');
+
+  if (voiceChannelsText.length < MESSAGE_CHARACTER_LIMIT) {
+    voiceChannelsText = voiceChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
+    voiceChannelsText = voiceChannelsText.substring(0, voiceChannelsText.lastIndexOf(','));
+    voiceChannelsText += '...';
+  }
+
+  embed.addField('Text Channels (' + textChannels.length + ')', textChannelsText);
+  embed.addField('Voice Channels (' + voiceChannels.length + ')', voiceChannelsText);
 
   const emojiArray = [];
   for (const [id, emoji] of guild.emojis) {

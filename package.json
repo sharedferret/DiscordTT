@@ -37,7 +37,6 @@
 		"redis": "^2.7.1",
 		"replaceall": "*",
 		"request": "*",
-		"rolling-rate-limiter": "^0.1.10",
 		"sqlite": "^2.8.0",
 		"sqlite3": "^3.1.8",
 		"tz-lookup": "^6.1.0",

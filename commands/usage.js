@@ -1,9 +1,9 @@
-const Discord = require('discord.js');
 const moment = require('moment');
 const db = require(global.paths.lib + 'database-client').db;
 
 const handleMessage = function(bot, message, input) {
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
+  
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
 
   db.all('SELECT * FROM CommandUsage WHERE date = ? GROUP BY commandName ORDER BY count DESC LIMIT 5', 

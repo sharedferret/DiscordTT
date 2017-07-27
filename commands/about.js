@@ -1,18 +1,15 @@
-const Discord = require('discord.js');
 const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
 
 const handleMessage = function(bot, message, input) {
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
+  
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
   embed.setDescription('Tohru is a music-focused bot bringing a Turntable.fm-style experience to Discord.');
 
   embed.addField('Development/Support Server', 'http://discord.tohru.club/', true);
   embed.addField('Invite Link', 'http://invite.tohru.club/', true);
-
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-  embed.setTimestamp(new Date());
 
   // TODO: This retrieves the current git-rev. Instead, run this at bot startup and cache the value.
   git.short(function(rev) {

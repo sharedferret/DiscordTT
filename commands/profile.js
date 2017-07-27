@@ -1,5 +1,4 @@
 const tt = require(global.paths.lib + 'turntable-handler');
-const Discord = require('discord.js');
 const db = require(global.paths.lib + 'database-client').db;
 const userHandler = require(global.paths.lib + 'user-handler');
 const countryData = require('country-data');
@@ -58,7 +57,7 @@ const handleMessage = function(bot, message) {
 };
 
 const displayProfileForUser = function(bot, message, user) {
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message, null, true);
 
   embed.setAuthor(user.username, user.avatarURL);
   embed.setTimestamp(new Date());

@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const moment = require('moment');
 
 const MESSAGE_CHARACTER_LIMIT = 1020;
@@ -8,7 +7,7 @@ const handleMessage = function(bot, message, input) {
     return message.reply('This command can only be used on a server, not via DM.');
   }
 
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
 
   const guild = message.guild;
 
@@ -65,7 +64,6 @@ const handleMessage = function(bot, message, input) {
   embed.addField('AFK Channel', guild.channels.get(guild.afkChannelID).name + ' (Timeout: ' + (guild.afkTimeout / 60) + ' minutes)', true);
   // embed.addField('Used Tohru Since', moment(guild.joinedTimestamp).format('dddd, MMMM Do YYYY'), true);
 
-  // TODO: Too many roles/channels causes a Discord length exception
   let roleArray = [];
   for (const [id, role] of guild.roles) {
     if (role.name != '@everyone') {

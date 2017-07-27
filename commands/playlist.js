@@ -1,6 +1,5 @@
 const playlistHandler = require(global.paths.lib + 'playlist-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
-const Discord = require('discord.js');
 const url = require('url');
 
 const viewPlaylists = function(bot, message, input) {

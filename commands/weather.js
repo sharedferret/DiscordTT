@@ -1,5 +1,4 @@
 const request = require('request');
-const Discord = require('discord.js');
 const moment = require('moment');
 require('moment-timezone');
 const DarkSky = require('dark-sky');
@@ -9,7 +8,7 @@ const userHandler = require(global.paths.lib + 'user-handler');
 const gmapsClient = require('@google/maps').createClient({ key: config.api.google });
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
-const RateLimiter = require('rolling-rate-limiter');
+const RateLimiter = require(global.paths.lib + 'rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   if (input.input) {
@@ -114,7 +113,7 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
         return message.reply('I couldn\'t find that city.');
       }
 
-      const embed = new Discord.RichEmbed();
+      const embed = Utils.createEmbed(message, 'OpenWeatherMap');
 
       const country = countryData.countries[weather.sys.country];
 
@@ -134,8 +133,6 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
       // embed.addField('Sunrise', ':sunrise: ' + ' ' + sunrise.format('h:mm a'), true);
       // embed.addField('Sunset', ':city_sunset: ' + ' ' + sunset.format('h:mm a'), true);
 
-      embed.setFooter('Requested by ' + message.author.username + ' | OpenWeatherMap', message.author.avatarURL);
-      embed.setTimestamp(new Date());
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + weather.coord.lat + ',' + weather.coord.lon + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
 
       message.channel.send('', { embed: embed });
@@ -149,7 +146,7 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
     .units('us')
     .get()
     .then(res => {
-      const embed = new Discord.RichEmbed();
+      const embed = Utils.createEmbed(message, 'Dark Sky');
 
       // TODO: Fix this once we add alternate ways of geocoding
       const country = countryData.countries[metadata.location.country];
@@ -221,8 +218,6 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
         embed.addField('Alerts', alertText);
       }
 
-      embed.setFooter('Requested by ' + message.author.username + ' | Dark Sky', message.author.avatarURL);
-      embed.setTimestamp(new Date());
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + res.latitude + ',' + res.longitude + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
 
       message.channel.send('', { embed: embed });

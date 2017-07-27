@@ -1,6 +1,6 @@
 const { URL, URLSearchParams } = require('url');
 const request = require('request');
-const RateLimiter = require('rolling-rate-limiter');
+const RateLimiter = require(global.paths.lib + 'rate-limiter');
 const redis = require(global.paths.lib + 'redis-client');
 
 const handleMessage = function(bot, message, input) {

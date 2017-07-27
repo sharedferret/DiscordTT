@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
 const moment = require('moment');
@@ -7,7 +6,7 @@ const tt = require(global.paths.lib + 'turntable-handler');
 require('moment-precise-range-plugin');
 
 const handleMessage = function(bot, message, input) {
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
 

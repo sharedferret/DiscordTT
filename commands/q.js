@@ -1,6 +1,5 @@
 const queueHandler = require(global.paths.lib + 'queue-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
-const Discord = require('discord.js');
 
 const qAdd = require(global.paths.commands + 'qadd');
 const qRm = require(global.paths.commands + 'qrm');

@@ -3,7 +3,6 @@ const queueHandler = require(global.paths.lib + 'queue-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
 const google = require('googleapis');
 const youtube = google.youtube('v3');
-const Discord = require('discord.js');
 const uuid = require('uuid/v4');
 
 const handleMessage = function(bot, message, input) {

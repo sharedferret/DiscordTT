@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const messageHandler = require(global.paths.lib + 'message-handler');
 
 const handleMessage = function(bot, message, input) {
@@ -10,7 +9,8 @@ const handleMessage = function(bot, message, input) {
 };
 
 const displayAllCommands = function(bot, message) {
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
+
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setTitle('Supported Commands');
   embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + config.discriminator + 'help [command name]`.');
@@ -28,8 +28,6 @@ const displayAllCommands = function(bot, message) {
       .join('`, `') + '`');
   }
 
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-  embed.setTimestamp(new Date());
   embed.setThumbnail(bot.user.avatarURL);
 
   message.channel.send('', { embed: embed });
@@ -40,13 +38,12 @@ const displayCommandPage = function(bot, message, commandName) {
     commandName = config.discriminator + commandName;
   }
 
-  // TODO: Likely needs to be updated to handle display command names
   const requestedCommand = messageHandler.fetchCommand(commandName);
 
   if (requestedCommand) {
     const command = requestedCommand.command;
 
-    const embed = new Discord.RichEmbed();
+    const embed = Utils.createEmbed(message);
     embed.setAuthor(bot.user.username, bot.user.avatarURL);
     embed.setTitle(command.info.name[0]);
     embed.setDescription('_' + (command.info.description ? command.info.description : 'No description available.') + '_');
@@ -85,9 +82,6 @@ const displayCommandPage = function(bot, message, commandName) {
     if (command.info.name.length > 1) {
       embed.addField('Aliases', command.info.name.join(', '));
     }
-
-    embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-    embed.setTimestamp(new Date());
 
     message.channel.send('', { embed: embed });
   } else {

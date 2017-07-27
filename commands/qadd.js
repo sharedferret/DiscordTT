@@ -3,7 +3,6 @@ const queueHandler = require(global.paths.lib + 'queue-handler');
 const tt = require(global.paths.lib + 'turntable-handler');
 const google = require('googleapis');
 const youtube = google.youtube('v3');
-const Discord = require('discord.js');
 const uuid = require('uuid/v4');
 const url = require('url');
 
@@ -36,11 +35,9 @@ const handleMessage = function(bot, message, input) {
     }
 
     if (response.items[0]) {
-      const embed = new Discord.RichEmbed();
+      const embed = Utils.createEmbed(message);
 
       embed.setAuthor(bot.user.username, bot.user.avatarURL);
-      embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-      embed.setTimestamp(new Date());
 
       embed.setTitle('Select a song to add');
 

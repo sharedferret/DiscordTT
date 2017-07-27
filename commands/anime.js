@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const request = require('request');
 const xml2js = require('xml2js');
 const htmltotext = require('html-to-text');
@@ -45,7 +44,7 @@ const respondWithKitsuOutput = function(message, result) {
       streamingLinks.push(streamingLink.attributes.url);
     }
 
-    const embed = new Discord.RichEmbed();
+    const embed = Utils.createEmbed(message, 'Kitsu.io');
 
     embed.setTitle(result.attributes.canonicalTitle);
     embed.setDescription(result.attributes.synopsis);
@@ -67,10 +66,6 @@ const respondWithKitsuOutput = function(message, result) {
     if (result.attributes.titles.ja_jp) altTitles.push('_Japanese_: ' + result.attributes.titles.ja_jp); 
     embed.addField('Alternate Titles', altTitles.join('\n'));
 
-    // TODO: Cache this data
-
-    embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-    embed.setTimestamp(new Date());
     embed.setThumbnail(result.attributes.posterImage.small);
 
     message.channel.send('', { embed: embed });
@@ -108,10 +103,9 @@ const respondWithMalOutput = function(message, result, searchString) {
 
           console.log('MAL XML Search matched: ' + entry.title[0]);
 
-          const embed = new Discord.RichEmbed();
+          const embed = Utils.createEmbed(message, 'MyAnimeList.net');
 
           embed.setTitle(entry.title[0]);
-
           embed.setDescription(htmltotext.fromString(entry.synopsis[0], { wordwrap: false }));
 
           embed.addField('Type', entry.type[0], true);
@@ -127,10 +121,6 @@ const respondWithMalOutput = function(message, result, searchString) {
           // if (result.attributes.titles.ja_jp) altTitles.push('_Japanese_: ' + result.attributes.titles.ja_jp); 
           // if (altTitles.length > 0) embed.addField('Alternate Titles', altTitles.join('\n'));
 
-          // TODO: Cache this data
-
-          embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-          embed.setTimestamp(new Date());
           embed.setThumbnail(entry.image[0]);
 
           message.channel.send('', { embed: embed });

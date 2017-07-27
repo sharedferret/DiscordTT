@@ -1,5 +1,4 @@
 const tt = require(global.paths.lib + 'turntable-handler');
-const Discord = require('discord.js');
 const db = require(global.paths.lib + 'database-client').db;
 
 const handleMessage = function(bot, message, input) {
@@ -7,10 +6,9 @@ const handleMessage = function(bot, message, input) {
     return message.reply('This command can only be used on a server, not via DM.');
   }
 
-  const embed = new Discord.RichEmbed();
+  const embed = Utils.createEmbed(message);
 
   embed.setAuthor('Current DJs', bot.user.avatarURL);
-  embed.setTimestamp(new Date());
 
   tt.getVotesForSong(bot, message.guild.id);
   const state = tt.getState(message.guild.id);
@@ -25,7 +23,6 @@ const handleMessage = function(bot, message, input) {
 
           for (var i in state.djs) {
             const djName = (state.currentDj == i ? ':cd: ' : '') + state.djs[i].username;
-            console.log('finding ' + state.djs[i].id);
             embed.addField(djName, _.find(result, function(j) { console.log('checking if ' + j.id + ' is equal to ' + state.djs[i].id); return j.id == state.djs[i].id; }).points + ' points', true);
           }
 

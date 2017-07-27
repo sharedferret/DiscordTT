@@ -1,5 +1,4 @@
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
-const Discord = require('discord.js');
 
 const updateGuildSettings = function(bot, message, input) {
   return message.reply('this command has not yet been implemented.');
@@ -44,11 +43,9 @@ const displayGuildSettings = function(bot, message, input) {
   const settings = serverSettingsManager.getSettings(guildId);
 
   if (settings) {
-    const embed = new Discord.RichEmbed();
+    const embed = Utils.createEmbed(message);
 
     embed.setAuthor('Server Settings', message.guild.iconURL);
-    embed.setTimestamp(new Date());
-    embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
     embed.setThumbnail(message.guild.iconURL);
 
     const guild = bot.guilds.get(guildId);

@@ -8,6 +8,7 @@ const userHandler = require(global.paths.lib + 'user-handler');
 const gmapsClient = require('@google/maps').createClient({ key: config.api.google });
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
+const RateLimiter = require('rolling-rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   if (requestIsEligible(message)) {
@@ -173,6 +174,14 @@ const requestIsEligible = function(message) {
   return serverSettings.weather && serverSettings.weather.enabled === 'true' && serverSettings.weather.source === 'DarkSky';
 };
 
+const limiter = RateLimiter({
+  namespace: 'UserRateLimit:forecast:',
+  interval: 300000,
+  maxInInterval: 5,
+  minDifference: 3000,
+  storeBlocked: false
+});
+
 const info = {
   name: ['forecast'],
   description: 'Gets the forecast for a given location.',
@@ -186,7 +195,8 @@ const info = {
         '': 'This command will use the location saved in your profile.'
       }
     }
-  }
+  },
+  rateLimiter: limiter
 };
 
 module.exports = {

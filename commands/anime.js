@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const request = require('request');
 const xml2js = require('xml2js');
 const htmltotext = require('html-to-text');
+const RateLimiter = require(global.paths.lib + 'rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   if (!input.input) {
@@ -140,6 +141,14 @@ const respondWithMalOutput = function(message, result, searchString) {
     });
 };
 
+const limiter = RateLimiter({
+  namespace: 'UserRateLimit:anime:',
+  interval: 300000,
+  maxInInterval: 5,
+  minDifference: 3000,
+  storeBlocked: false
+});
+
 const info = {
   name: ['anime'],
   description: 'Searches MyAnimeList for anime information.',
@@ -151,7 +160,8 @@ const info = {
         '[search string]': 'Search for and display information about an anime.'
       }
     }
-  }
+  },
+  rateLimiter: limiter
 };
 
 module.exports = {

@@ -7,6 +7,7 @@ const bot = new Discord.Client();
 
 const messageHandler = require(global.paths.lib + 'message-handler');
 const dbClient = require(global.paths.lib + 'database-client');
+const redisClient = require(global.paths.lib + 'redis-client');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const userHandler = require(global.paths.lib + 'user-handler');
 require(global.paths.lib + 'turntable-handler');

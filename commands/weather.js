@@ -9,6 +9,7 @@ const userHandler = require(global.paths.lib + 'user-handler');
 const gmapsClient = require('@google/maps').createClient({ key: config.api.google });
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
+const RateLimiter = require('rolling-rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   if (input.input) {
@@ -231,6 +232,14 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
     });
 };
 
+const limiter = RateLimiter({
+  namespace: 'UserRateLimit:weather:',
+  interval: 300000,
+  maxInInterval: 5,
+  minDifference: 3000,
+  storeBlocked: false
+});
+
 const info = {
   name: ['weather', 'wx'],
   description: 'Gets the current conditions for a given location.',
@@ -244,7 +253,8 @@ const info = {
         '': 'This command will use the location saved in your profile.'
       }
     }
-  }
+  },
+  rateLimiter: limiter
 };
 
 module.exports = {

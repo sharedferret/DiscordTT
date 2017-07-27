@@ -1,5 +1,7 @@
 const { URL, URLSearchParams } = require('url');
 const request = require('request');
+const RateLimiter = require('rolling-rate-limiter');
+const redis = require(global.paths.lib + 'redis-client');
 
 const handleMessage = function(bot, message, input) {
   const searchParameters = input.input;
@@ -30,6 +32,14 @@ const handleMessage = function(bot, message, input) {
   });
 };
 
+const limiter = RateLimiter({
+  namespace: 'UserRateLimit:awwnime:',
+  interval: 300000,
+  maxInInterval: 5,
+  minDifference: 3000,
+  storeBlocked: false
+});
+
 const info = {
   name: ['awwnime'],
   description: 'Redditbooru image search.',
@@ -50,7 +60,8 @@ const info = {
     'awwnime yui -s k_on'
   ],
   type: CommandType.Image,
-  hidden: false
+  hidden: false,
+  rateLimiter: limiter
 };
 
 module.exports = {

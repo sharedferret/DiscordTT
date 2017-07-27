@@ -1,6 +1,6 @@
 const tt = require(global.paths.lib + 'turntable-handler');
 const Discord = require('discord.js');
-const db = require(global.paths.lib + 'database-handler').db;
+const db = require(global.paths.lib + 'database-client').db;
 const userHandler = require(global.paths.lib + 'user-handler');
 const countryData = require('country-data');
 const request = require('request');

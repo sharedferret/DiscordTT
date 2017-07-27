@@ -6,8 +6,7 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 
 const messageHandler = require(global.paths.lib + 'message-handler');
-const hookHandler = require(global.paths.lib + 'hook-handler');
-const databaseHandler = require(global.paths.lib + 'database-handler');
+const dbClient = require(global.paths.lib + 'database-client');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const userHandler = require(global.paths.lib + 'user-handler');
 require(global.paths.lib + 'turntable-handler');
@@ -21,7 +20,7 @@ bot.on('message', function(message) {
   }
 });
 
-bot.on('ready', function(data) { // jshint ignore:line
+bot.on('ready', function(data) {
   // Try to disconnect from any active voice channels
   console.log('VCs: ', bot.voiceConnections);
   for (let connection of bot.voiceConnections) {
@@ -67,7 +66,7 @@ function exitHandler(options, err) {
   }
 
   // Close database connection
-  databaseHandler.closeDb();
+  dbClient.closeDb();
 
   // Disconnect from any active voice channels
   bot.voiceConnections.every(function(i) {

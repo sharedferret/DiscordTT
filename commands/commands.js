@@ -48,8 +48,9 @@ const displayCommandPage = function(bot, message, commandName) {
     embed.setTitle(command.info.name[0]);
     embed.setDescription('_' + (command.info.description ? command.info.description : 'No description available.') + '_');
     
-    // Usage
+    // Usage, flags
     let usage = [];
+    let flags = [];
     
     _.forOwn(command.info.operations, function(operation, operationName) {
       _.forOwn(operation.usage, function(usageEntryDescription, usageEntryName) {
@@ -66,12 +67,17 @@ const displayCommandPage = function(bot, message, commandName) {
         entryText += '`: ' + usageEntryDescription;
         usage.push(entryText);
       });
+
       usage.push('');
+
+      _.forOwn(operation.flags, function(flagDescription, flagName) {
+        const entryText = '`-' + flagName + '`: ' + flagDescription;
+        flags.push(entryText);
+      });
     });
 
     embed.addField('Usage', usage.join('\n'));
-
-    // Flags
+    embed.addField('Flags', flags.join('\n'));
 
     if (command.info.examples) {
       embed.addField('Examples', command.info.examples.map(function(i) {

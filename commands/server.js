@@ -61,7 +61,10 @@ const handleMessage = function(bot, message, input) {
 
   embed.addField('Region', guildText, true);
   embed.addField('Channel ID', '`' + guild.id + '`', true);
+
+  if (guild.afkChannelID) {
   embed.addField('AFK Channel', guild.channels.get(guild.afkChannelID).name + ' (Timeout: ' + (guild.afkTimeout / 60) + ' minutes)', true);
+  }
   // embed.addField('Used Tohru Since', moment(guild.joinedTimestamp).format('dddd, MMMM Do YYYY'), true);
 
   let roleArray = [];
@@ -74,16 +77,18 @@ const handleMessage = function(bot, message, input) {
     }
   }
 
-  const roles = _.compact(_.flatten(roleArray));
-  let roleText = roles.join(', ');
+  if (roleArray.length > 0) {
+    const roles = _.compact(_.flatten(roleArray));
+    let roleText = roles.join(', ');
 
-  if (roleText.length > MESSAGE_CHARACTER_LIMIT) {
-    roleText = roleText.substring(0, MESSAGE_CHARACTER_LIMIT);
-    roleText = roleText.substring(0, roleText.lastIndexOf(','));
-    roleText += '...';
+    if (roleText.length > MESSAGE_CHARACTER_LIMIT) {
+      roleText = roleText.substring(0, MESSAGE_CHARACTER_LIMIT);
+      roleText = roleText.substring(0, roleText.lastIndexOf(','));
+      roleText += '...';
+    }
+
+    embed.addField('Roles (' + roles.length + ')', roleText);
   }
-
-  embed.addField('Roles (' + roles.length + ')', roleText);
 
   let textChannelArray = [];
   let voiceChannelArray = [];
@@ -102,43 +107,45 @@ const handleMessage = function(bot, message, input) {
     }
   }
 
-  const textChannels = _.compact(_.flatten(textChannelArray));
-  const voiceChannels = _.compact(_.flatten(voiceChannelArray));
+  if (textChannelArray.length > 0) {
+    const textChannels = _.compact(_.flatten(textChannelArray));
+    let textChannelsText = textChannels.join(', ');
 
-  let textChannelsText = textChannels.join(', ');
-
-  if (textChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
-    textChannelsText = textChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
-    textChannelsText = textChannelsText.substring(0, textChannelsText.lastIndexOf(','));
-    textChannelsText += '...';
+    if (textChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
+      textChannelsText = textChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
+      textChannelsText = textChannelsText.substring(0, textChannelsText.lastIndexOf(','));
+      textChannelsText += '...';
+    }
+    embed.addField('Text Channels (' + textChannels.length + ')', textChannelsText);
   }
 
-  let voiceChannelsText = voiceChannels.join(', ');
+  if (voiceChannelArray.length > 0) {
+    const voiceChannels = _.compact(_.flatten(voiceChannelArray));
+    let voiceChannelsText = voiceChannels.join(', ');
 
-  if (voiceChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
-    voiceChannelsText = voiceChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
-    voiceChannelsText = voiceChannelsText.substring(0, voiceChannelsText.lastIndexOf(','));
-    voiceChannelsText += '...';
+    if (voiceChannelsText.length > MESSAGE_CHARACTER_LIMIT) {
+      voiceChannelsText = voiceChannelsText.substring(0, MESSAGE_CHARACTER_LIMIT);
+      voiceChannelsText = voiceChannelsText.substring(0, voiceChannelsText.lastIndexOf(','));
+      voiceChannelsText += '...';
+    }
+    embed.addField('Voice Channels (' + voiceChannels.length + ')', voiceChannelsText);
   }
-
-  embed.addField('Text Channels (' + textChannels.length + ')', textChannelsText);
-  embed.addField('Voice Channels (' + voiceChannels.length + ')', voiceChannelsText);
 
   const emojiArray = [];
   for (const [id, emoji] of guild.emojis) {
     emojiArray.push('<:' + emoji.name + ':' + id + '>');
   }
 
-  let emojiText = emojiArray.join(', ');
-
-  if (emojiText.length > MESSAGE_CHARACTER_LIMIT) {
-    emojiText = emojiText.substring(0, MESSAGE_CHARACTER_LIMIT);
-    emojiText = emojiText.substring(0, emojiText.lastIndexOf(' '));
-    emojiText += '...';
+  if (emojiArray.length > 0) {
+    let emojiText = emojiArray.join(', ');
+    if (emojiText.length > MESSAGE_CHARACTER_LIMIT) {
+      emojiText = emojiText.substring(0, MESSAGE_CHARACTER_LIMIT);
+      emojiText = emojiText.substring(0, emojiText.lastIndexOf(' '));
+      emojiText += '...';
+    }
+    embed.addField('Custom Emoji', emojiText);
   }
-
-  embed.addField('Custom Emoji', emojiText);
-
+  
   message.channel.send('', { embed: embed });
 };
 

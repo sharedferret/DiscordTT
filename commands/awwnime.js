@@ -4,11 +4,59 @@ const RateLimiter = require(global.paths.lib + 'rate-limiter');
 const redis = require(global.paths.lib + 'redis-client');
 
 const handleMessage = function(bot, message, input) {
+  if (input.flags && input.flags.l === '') {
+    return listSubreddits(message);
+  }
+
+  let sources = [];
+
+  if (input.flags && input.flags.s) {
+    const userSources = input.flags.s.split(' ');
+
+    for (const userSource of userSources) {
+      if (Utils.Subreddit[userSource]) {
+        sources.push(Utils.Subreddit[userSource].id);
+      }
+    }
+  }
+  
+  if (sources.length == 0) {
+    sources = [
+      Utils.Subreddit.awwnime.id,
+      Utils.Subreddit.animewallpaper.id,
+      Utils.Subreddit.araragigirls.id,
+      Utils.Subreddit.cutelittlefangs.id,
+      Utils.Subreddit.hatsune.id,
+      Utils.Subreddit.headpats.id,
+      Utils.Subreddit.homura.id,
+      Utils.Subreddit.honkers.id,
+      Utils.Subreddit.imouto.id,
+      Utils.Subreddit.k_on.id,
+      Utils.Subreddit.kanmusu.id,
+      Utils.Subreddit.kemonomimi.id,
+      Utils.Subreddit.kitsunemimi.id,
+      Utils.Subreddit.lovelive.id,
+      Utils.Subreddit.megane.id,
+      Utils.Subreddit.moescape.id,
+      Utils.Subreddit.oddeye.id,
+      Utils.Subreddit.onetrueidol.id,
+      Utils.Subreddit.onodera.id,
+      Utils.Subreddit.patchuu.id,
+      Utils.Subreddit.theforgottenidol.id,
+      Utils.Subreddit.thericegoddess.id,
+      Utils.Subreddit.tsunderes.id,
+      Utils.Subreddit.twgok.id,
+      Utils.Subreddit.twintails.id,
+      Utils.Subreddit.twodeeart.id
+    ];
+  }
+
   const searchParameters = input.input;
 
   const url = new URL('https://www.redditbooru.com/images/');
   if (searchParameters) url.searchParams.append('q', searchParameters);
-  url.searchParams.append('sources', '1,44,50,61,38,28,43,21,47,13,41,26,20,7,46,48,15,62,33,30,17,55,35,19,32,34,23');
+
+  url.searchParams.append('sources', sources.join(','));
   url.searchParams.append('limit', '20');
   console.log(url.href);
 
@@ -32,6 +80,18 @@ const handleMessage = function(bot, message, input) {
   });
 };
 
+const listSubreddits = function(message) {
+  const sfwSubreddits = [];
+
+  _.forOwn(Utils.Subreddit, function(subredditInfo, subredditName) {
+    if (subredditInfo.sfw) {
+      sfwSubreddits.push(subredditName);
+    }
+  });
+
+  message.reply('these are the subreddits I am able to search in:\n' + sfwSubreddits.sort().join(', '));
+};
+
 const limiter = RateLimiter({
   namespace: 'UserRateLimit:awwnime:',
   interval: 300000,
@@ -51,13 +111,14 @@ const info = {
         '[search term]': 'Returns an image for the given search term.'
       },
       flags: {
-        s: 'Search a specific subreddit.',
+        s: 'Search a specific subreddit (supports multiple subreddits, space delimited).',
         l: 'List supported subreddits.'
       }
     }
   },
   examples: [
-    'awwnime yui -s k_on'
+    'awwnime yui -s k_on',
+    'awwnime hanayo -s lovelive thericegoddess awwnime'
   ],
   type: CommandType.Image,
   hidden: false,

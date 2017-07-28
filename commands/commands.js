@@ -76,8 +76,13 @@ const displayCommandPage = function(bot, message, commandName) {
       });
     });
 
-    embed.addField('Usage', usage.join('\n'));
-    embed.addField('Flags', flags.join('\n'));
+    if (usage.length > 0) {
+      embed.addField('Usage', usage.join('\n'));
+    }
+    
+    if (flags.length > 0) {
+      embed.addField('Flags', flags.join('\n'));
+    }
 
     if (command.info.examples) {
       embed.addField('Examples', command.info.examples.map(function(i) {

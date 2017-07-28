@@ -12,14 +12,15 @@ const RateLimiter = require(global.paths.lib + 'rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   if (input.input) {
-    retrieveWeather(bot, message, input.input, null);
+    retrieveWeather(bot, message, input, null);
   } else {
     userHandler.getProfile(message.author, message.guild ? message.guild.id : null, function(profile) {
       if (profile) {
         const metadata = JSON.parse(profile.metadata);
 
         if (metadata && metadata.location && metadata.location.formatted_address) {
-          return retrieveWeather(bot, message, metadata.location.formatted_address, metadata);
+          input.input = metadata.location.formatted_address;
+          return retrieveWeather(bot, message, input, metadata);
         }
       }
 
@@ -28,64 +29,77 @@ const handleMessage = function(bot, message, input) {
   }
 };
 
-const retrieveWeather = function(bot, message, searchParameters, metadata) {
-  const serverSettings = serverSettingsManager.getSettings(message.guild.id);
+const retrieveWeather = function(bot, message, input, metadata) {
+  const serverSettings = message.guild ? serverSettingsManager.getSettings(message.guild.id) : null;
+  const searchParameters = input.input;
+
+  let source = 'OpenWeatherMap';
+
+  if (serverSettings && serverSettings.weather && serverSettings.weather.source) {
+    source = serverSettings.weather.source;
+  }
+
+  if (input.flags && input.flags.owm === '') {
+    source = 'OpenWeatherMap';
+  }
+
+  if (input.flags && input.flags.darksky === '') {
+    source = 'DarkSky';
+  }
 
   // TODO: Quota management, fallback to OWM if DS quota reached
   // TODO: Shared code with forecast.js
-  if (serverSettings.weather && serverSettings.weather.enabled == 'true') {
-    if (serverSettings.weather.source == 'DarkSky') {
-      if (!metadata) {
-        if (global.locationCache[searchParameters]) {
-          console.log('Using cached location data');
-          retrieveWeather_DarkSky(bot, message, global.locationCache[searchParameters]);
-        } else {
-          console.log('Calling Google for geocode');
-
-          // TODO: Cache this result
-          gmapsClient.geocode({
-            address: searchParameters
-          }, function(err, response) {
-            if (err) {
-              message.reply('I couldn\'t find that city.');
-              console.warn('Geocode error', err);
-            }
-
-            const metadata = {};
-            metadata.location = {};
-            metadata.location.coordinates = {};
-
-            const metadataComponents = {};
-
-            const result = response.json.results[0];
-
-            for (const component of result.address_components) {
-              metadataComponents[component.types[0]] = component.long_name;
-
-              if (component.types[0] == 'country') {
-                metadata.location.country = component.short_name;
-              }
-            }
-
-            metadata.location.components = metadataComponents;
-
-            metadata.location.coordinates.latitude = result.geometry.location.lat;
-            metadata.location.coordinates.longitude = result.geometry.location.lng;
-            metadata.location.formatted_address = result.formatted_address;
-            metadata.location.timezone = tzlookup(result.geometry.location.lat, result.geometry.location.lng);
-
-            // Add to cache
-            global.locationCache[searchParameters] = metadata;
-
-            retrieveWeather_DarkSky(bot, message, metadata);
-          });
-        }
+  if (source == 'DarkSky') {
+    if (!metadata) {
+      if (global.locationCache[searchParameters]) {
+        console.log('Using cached location data');
+        retrieveWeather_DarkSky(bot, message, global.locationCache[searchParameters]);
       } else {
-        retrieveWeather_DarkSky(bot, message, metadata);
+        console.log('Calling Google for geocode');
+
+        // TODO: Cache this result
+        gmapsClient.geocode({
+          address: searchParameters
+        }, function(err, response) {
+          if (err) {
+            message.reply('I couldn\'t find that city.');
+            console.warn('Geocode error', err);
+          }
+
+          const metadata = {};
+          metadata.location = {};
+          metadata.location.coordinates = {};
+
+          const metadataComponents = {};
+
+          const result = response.json.results[0];
+
+          for (const component of result.address_components) {
+            metadataComponents[component.types[0]] = component.long_name;
+
+            if (component.types[0] == 'country') {
+              metadata.location.country = component.short_name;
+            }
+          }
+
+          metadata.location.components = metadataComponents;
+
+          metadata.location.coordinates.latitude = result.geometry.location.lat;
+          metadata.location.coordinates.longitude = result.geometry.location.lng;
+          metadata.location.formatted_address = result.formatted_address;
+          metadata.location.timezone = tzlookup(result.geometry.location.lat, result.geometry.location.lng);
+
+          // Add to cache
+          global.locationCache[searchParameters] = metadata;
+
+          retrieveWeather_DarkSky(bot, message, metadata);
+        });
       }
     } else {
-      retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
+      retrieveWeather_DarkSky(bot, message, metadata);
     }
+  } else {
+    retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
   }
 };
 
@@ -246,6 +260,10 @@ const info = {
       usage: {
         '[location]': 'This command accepts most location identifiers, including town names and postcodes.',
         '': 'This command will use the location saved in your profile.'
+      },
+      flags: {
+        owm: 'Use data from the OpenWeatherMap API.',
+        darksky: 'Use data from the Dark Sky API (if available/permitted).'
       }
     }
   },

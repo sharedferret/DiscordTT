@@ -17,43 +17,6 @@ const displayProfile = function(bot, message, input) {
   } else {
     displayProfileForUser(bot, message, message.author);
   }
-}
-
-const handleMessage = function(bot, message) {
-  if (message.mentions.users.size > 0) {
-    console.log('showing profile for first mention');
-    displayProfileForUser(bot, message, message.mentions.users.first());
-  } else if (message.content.length > config.discriminator.length + 8) {
-    const cmd = message.content.substring(config.discriminator.length, message.content.length).split(' ');
-    if (cmd[3]) {
-      cmd[3] = cmd.slice(3, cmd.length).join(' ');
-    }
-
-    switch(cmd[1]) {
-      case 'set':
-        switch(cmd[2]) {
-          case 'country':
-            profileSetCountry(bot, message, cmd[3]);
-            break;
-          case 'location':
-            profileSetLocation(bot, message, cmd[3]);
-            break;
-          case 'description':
-            profileSetDescription(bot, message, cmd[3]);
-            break;
-          case 'battletag':
-            profileSetBattletag(bot, message, cmd[3]);
-            break;
-          default:
-            message.reply('please provide a valid profile section.');
-        }
-        break;
-      default:
-        break;
-    }
-  } else {
-    displayProfileForUser(bot, message, message.author);
-  }
 };
 
 const displayProfileForUser = function(bot, message, user) {

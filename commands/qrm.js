@@ -24,7 +24,7 @@ const info = {
     _default: {
       handler: handleMessage,
       usage: {
-        '[queue location]': 'Removes the song at the given position in your queue. (To find the position, use `' + config.discriminator + 'q`)'
+        '[queue location]': 'Removes the song at the given position in your queue. (To find the position, use `' + config.prefix + 'q`)'
       }
     }
   }

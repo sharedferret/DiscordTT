@@ -41,13 +41,13 @@ const info = {
     add: {
       handler: qAdd.handleMessage,
       usage: {
-        '[song name]': 'Add a song to your queue (see also `' + config.discriminator + 'q+`).'
+        '[song name]': 'Add a song to your queue (see also `' + config.prefix + 'q+`).'
       }
     },
     remove: {
       handler: qRm.handleMessage,
       usage: {
-        '[song position]': 'Remove a song at the given position (see also `' + config.discriminator + 'q-`).'
+        '[song position]': 'Remove a song at the given position (see also `' + config.prefix + 'q-`).'
       }
     }
   }

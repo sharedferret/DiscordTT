@@ -61,7 +61,7 @@ const handleMessage = function(bot, message, input) {
           if (metadata && metadata.location) {
             retrieveForecast(bot, message, metadata);
           } else {
-            message.reply('your profile doesn\'t have a location. Set one by typing `' + config.discriminator + 'profile set location YOUR_LOCATION`.');
+            message.reply('your profile doesn\'t have a location. Set one by typing `' + Utils.getPrefix(message.guild ? message.guild.id : null) + 'profile set location YOUR_LOCATION`.');
           }
         } else {
           message.reply('please provide a city to search for.');
@@ -168,7 +168,7 @@ const requestIsEligible = function(message) {
   }
 
   const serverSettings = serverSettingsManager.getSettings(message.guild.id);
-  return serverSettings.weather && serverSettings.weather.enabled === 'true' && serverSettings.weather.source === 'DarkSky';
+  return serverSettings.weather && serverSettings.weather.enabled && serverSettings.weather.source === 'DarkSky';
 };
 
 const limiter = RateLimiter({

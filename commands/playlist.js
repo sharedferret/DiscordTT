@@ -111,7 +111,7 @@ const info = {
     rename: {
       handler: renamePlaylist,
       usage: {
-        '[playlist ID] [new playlist name]': 'Rename a playlist (this command only supports playlist IDs - use `' + config.discriminator + 'pl` to find the playlist\'s ID).'
+        '[playlist ID] [new playlist name]': 'Rename a playlist (this command only supports playlist IDs - use `' + config.prefix + 'pl` to find the playlist\'s ID).'
       }
     },
     shuffle: {

@@ -9,11 +9,12 @@ const handleMessage = function(bot, message, input) {
 };
 
 const displayAllCommands = function(bot, message) {
+  const prefix = Utils.getPrefix(message.guild ? message.guild.id : null);
   const embed = Utils.createEmbed(message);
 
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setTitle('Supported Commands');
-  embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + config.discriminator + 'help [command name]`.');
+  embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + prefix + 'help [command name]`.');
   
   const sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.info.type; });
 
@@ -22,8 +23,8 @@ const displayAllCommands = function(bot, message) {
       '`' + sortedCommands[commandType]
       .filter(function(i) { return i.hidden !== true; })
       .map(function(i) {
-        if (i.info.displayNames) return i.info.displayNames.map(function(i) { return config.discriminator + i; }).join(', ');
-        return config.discriminator + i.info.name[0]
+        if (i.info.displayNames) return i.info.displayNames.map(function(i) { return prefix + i; }).join(', ');
+        return prefix + i.info.name[0]
       })
       .join('`, `') + '`');
   }
@@ -34,11 +35,13 @@ const displayAllCommands = function(bot, message) {
 }
 
 const displayCommandPage = function(bot, message, commandName) {
-  if (!commandName.startsWith(config.discriminator)) {
-    commandName = config.discriminator + commandName;
+  const prefix = Utils.getPrefix(message.guild ? message.guild.id : null);
+
+  if (!commandName.startsWith(prefix)) {
+    commandName = prefix + commandName;
   }
 
-  const requestedCommand = messageHandler.fetchCommand(commandName);
+  const requestedCommand = messageHandler.fetchCommand(commandName, message.guild ? message.guild.id : null);
 
   if (requestedCommand) {
     const command = requestedCommand.command;
@@ -54,7 +57,7 @@ const displayCommandPage = function(bot, message, commandName) {
     
     _.forOwn(command.info.operations, function(operation, operationName) {
       _.forOwn(operation.usage, function(usageEntryDescription, usageEntryName) {
-        let entryText = '`' + config.discriminator + command.info.name[0];
+        let entryText = '`' + prefix + command.info.name[0];
 
         if (operationName !== '_default') {
           entryText += ' ' + operationName;
@@ -68,11 +71,15 @@ const displayCommandPage = function(bot, message, commandName) {
         usage.push(entryText);
       });
 
-      usage.push('');
-
+      if (operation.usage.length > 0) {
+        usage.push('');
+      }
+      
       _.forOwn(operation.flags, function(flagDescription, flagName) {
-        const entryText = '`-' + flagName + '`: ' + flagDescription;
-        flags.push(entryText);
+        if (flagDescription) {
+          const entryText = '`-' + flagName + '`: ' + flagDescription;
+          flags.push(entryText);
+        }
       });
     });
 
@@ -86,7 +93,7 @@ const displayCommandPage = function(bot, message, commandName) {
 
     if (command.info.examples) {
       embed.addField('Examples', command.info.examples.map(function(i) {
-        return '`' + config.discriminator + i + '`';
+        return '`' + prefix + i + '`';
       }).join('\n'));
     }
 
@@ -98,10 +105,6 @@ const displayCommandPage = function(bot, message, commandName) {
   } else {
     message.reply('I couldn\'t find that command.');
   }
-};
-
-const matches = function(input) {
-  return info.name.map(function(i) { return config.discriminator + i; }).indexOf(input.trim()) !== -1 || _.startsWith(input, config.discriminator + 'help');
 };
 
 const info = {

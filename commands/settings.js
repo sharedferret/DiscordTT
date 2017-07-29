@@ -25,7 +25,7 @@ const updateGuildSettings = function(bot, message, input) {
         }
 
         // Clear prefix if -clear is passed, otherwise update prefix if input exists
-        if (input.flags && input.flags.clear) {
+        if (input.flags && input.flags.clear !== undefined) {
           updates['prefix.custom'] = null;
         } else if (update) {
           updates['prefix.custom'] = update;

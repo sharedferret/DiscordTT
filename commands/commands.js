@@ -71,7 +71,7 @@ const displayCommandPage = function(bot, message, commandName) {
         usage.push(entryText);
       });
 
-      if (operation.usage.length > 0) {
+      if (operation.usage) {
         usage.push('');
       }
       

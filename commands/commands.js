@@ -9,24 +9,29 @@ const handleMessage = function(bot, message, input) {
 };
 
 const displayAllCommands = function(bot, message) {
-  const prefix = Utils.getPrefix(message.guild ? message.guild.id : null);
   const embed = Utils.createEmbed(message);
 
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setTitle('Supported Commands');
-  embed.setDescription('Here\'s a list of all the commands I support. For more info, type `' + prefix + 'help [command name]`.');
+  embed.setDescription('Here\'s a list of all the commands I support. For more info, type ' +
+    Utils.createCommandWithPrefix('help [command name]', message.guild ? message.guild.id : null) + '.');
   
   const sortedCommands = _.groupBy(messageHandler.commands, function(i) { return i.info.type; });
 
   for (let commandType in sortedCommands) {
     embed.addField(commandType,
-      '`' + sortedCommands[commandType]
+      sortedCommands[commandType]
       .filter(function(i) { return i.hidden !== true; })
       .map(function(i) {
-        if (i.info.displayNames) return i.info.displayNames.map(function(i) { return prefix + i; }).join(', ');
-        return prefix + i.info.name[0]
+        if (i.info.displayNames) {
+          return i.info.displayNames.map(function(i) {
+            return Utils.createCommandWithPrefix(i, message.guild ? message.guild.id : null);
+          }).join(', ');
+        }
+
+        return Utils.createCommandWithPrefix(i.info.name[0], message.guild ? message.guild.id : null);
       })
-      .join('`, `') + '`');
+      .join(', '));
   }
 
   embed.setThumbnail(bot.user.avatarURL);
@@ -57,7 +62,7 @@ const displayCommandPage = function(bot, message, commandName) {
     
     _.forOwn(command.info.operations, function(operation, operationName) {
       _.forOwn(operation.usage, function(usageEntryDescription, usageEntryName) {
-        let entryText = '`' + prefix + command.info.name[0];
+        let entryText = Utils.createCommandWithPrefix(command.info.name[0], message.guild ? message.guild.id : null, true);
 
         if (operationName !== '_default') {
           entryText += ' ' + operationName;

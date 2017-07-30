@@ -12,7 +12,7 @@ const serverSettingsManager = require(global.paths.lib + 'server-settings-manage
 const userHandler = require(global.paths.lib + 'user-handler');
 require(global.paths.lib + 'turntable-handler');
 
-bot.on('message', function(message) {
+bot.on('message', message => {
   messageHandler.handleMessage(bot, message);
 
   // Add a chatMessage point (bots can't earn points)
@@ -21,11 +21,9 @@ bot.on('message', function(message) {
   }
 });
 
-bot.on('ready', function(data) {
+bot.on('ready', data => {
   // Try to disconnect from any active voice channels
-  console.log('VCs: ', bot.voiceConnections);
   for (let connection of bot.voiceConnections) {
-    console.log('disconnecting from ' + connection);
     bot.voiceConnections[connection].disconnect();
   }
 
@@ -47,11 +45,32 @@ bot.on('ready', function(data) {
   };
 });
 
-bot.on('guildCreate', function(guild) {
+bot.on('guildCreate', guild => {
   serverSettingsManager.registerServer(guild.id);
 });
 
-bot.on('reconnecting', function() {
+bot.on('guildMemberAdd', member => {
+  const settings = serverSettingsManager.getSettings(member.guild.id);
+
+  // If autorole is enabled, add the default role to this user
+  if (settings.autorole.enabled && settings.autorole.defaultRole) {
+    member.addRole(settings.autorole.defaultRole)
+      .catch(err => {
+        // TODO: This will likely be a permission error - the bot needs to remove the role
+        // and fire an alert to a logging channel
+        console.warn(err);
+      });
+  }
+
+  userHandler.createUser(member.user, member.guild.id);
+});
+
+// TODO: I hope I don't have to, but TT votes might need to be handled via this
+bot.on('messageReactionAdd', (messageReaction, user) => {
+
+});
+
+bot.on('reconnecting', () => {
   console.log('attempting to reconnect @ ' + new Date());
 });
 

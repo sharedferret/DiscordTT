@@ -32,7 +32,9 @@ const info = {
   operations: {
     _default: {
       handler: handleMessage,
-      usage: 'List all commands.'
+      usage: {
+        '': 'List all commands.'
+      }
     }
   },
   type: CommandType.General

@@ -6,6 +6,7 @@ const updateGuildSettings = function(bot, message, input) {
   };
 
   // Gated by Administrator discord permission
+  // TODO: Expand permissions to more people
   if (message.member.hasPermission('ADMINISTRATOR')) {
     if (!input.input) {
       return message.reply('please provide a guild setting and new value to update.');
@@ -34,6 +35,16 @@ const updateGuildSettings = function(bot, message, input) {
       case 'leavemessage':
         guildUpdateLeaveMessage(bot, message, input, update);
         break;
+      case 'logs':
+        guildUpdateLogs(bot, message, input, update);
+        break;
+      case 'logchannel':
+        guildUpdateLogChannel(bot, message, input, update);
+        break;
+      case 'excludelog':
+      case 'logexclude':
+        guildUpdateLogExclude(bot, message, input, update);
+        break;
       default:
         return message.reply('please provide a valid setting to update.');
     }
@@ -42,16 +53,153 @@ const updateGuildSettings = function(bot, message, input) {
   }
 };
 
+const guildUpdateLogs = function(bot, message, input, update) {
+  const updates = {};
+
+  if (input.operation === 'enable') {
+    updates['logs.enabled'] = true;
+    serverSettingsManager.updateSettings(message, message.guild.id, updates);
+    message.reply('logging has been enabled.');
+  } else if (input.operation === 'disable') {
+    updates['logs.enabled'] = false;
+    serverSettingsManager.updateSettings(message, message.guild.id, updates);
+    message.reply('logging has been disabled.');
+  }
+};
+
+const guildUpdateLogChannel = (bot, message, input, update) => {
+  const updates = {};
+
+  switch (input.operation) {
+    case 'add':
+    case 'update':
+      const logChannel = message.guild.channels.filter(i => { return i.name === update || i.id == update; }).first();
+
+      if (logChannel) {
+        logChannel.send('#' + logChannel.name + ' registered for logging.')
+          .then(logChannelMessage => {
+            updates['logs.logChannel'] = logChannel.id;
+            serverSettingsManager.updateSettings(message, message.guild.id, updates);
+            message.reply('the guild\'s logging channel has been updated.');
+          })
+          .catch(err => {
+            return message.reply('I wasn\'t able to send a message to that channel. Please check the channel permissions.');
+          });
+      } else {
+        return message.reply('I couldn\'t find that channel.');
+      }
+      break;
+    case 'remove':
+      updates['logs.logChannel'] = undefined;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the guild\'s logging channel has been cleared.');
+      break;
+    default:
+      break;
+  }
+};
+
+const guildUpdateLogExclude = (bot, message, input, update) => {
+  const updates = {};
+
+  let excludeText = update;
+
+  if (!excludeText && input.flags && input.flags.channel) excludeText = input.flags.channel;
+  if (!excludeText && input.flags && input.flags.c) excludeText = input.flags.c;
+  if (!excludeText && input.flags && input.flags.role) excludeText = input.flags.role;
+  if (!excludeText && input.flags && input.flags.r) excludeText = input.flags.r;
+
+  switch (input.operation) {
+    case 'add':
+    case 'update':
+      const role = message.guild.roles.filter(i => { return i.name == excludeText || i.id == excludeText; }).first();
+      const channel = message.guild.channels.filter(i => { return i.name == excludeText || i.id == excludeText; }).first();
+
+      if (input.flags && (input.flags.channel || input.flags.c)) {
+        if (channel) {
+          updates['logs.excludechannels.' + channel.id] = null;
+          serverSettingsManager.updateSettings(message, message.guild.id, updates);
+          message.reply('actions from the `' + channel.name + '` channel will not be logged.');
+        } else {
+          message.reply('that is not a valid channel name.');
+        }
+      } else if (input.flags && (input.flags.role || input.flags.r)) {
+        if (role) {
+          updates['logs.excluderoles.' + role.id] = null;
+          serverSettingsManager.updateSettings(message, message.guild.id, updates);
+          message.reply('actions from the `' + role.name + '` role will not be logged.');
+        } else {
+          message.reply('that is not a valid role name.');
+        }
+      } else if (role && channel) {
+        return message.reply('your guild has a role and channel both named `' + excludeText + '`. Please specify whether you want to exclude a channel or role by using the `-channel` or `-role` flag.');
+      } else if (role) {
+        updates['logs.excluderoles.' + role.id] = null;
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply('actions from the `' + role.name + '` role will not be logged.');
+      } else if (channel) {
+        updates['logs.excludechannels.' + channel.id] = null;
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply('actions from the `' + channel.name + '` channel will not be logged.');
+      } else {
+        message.reply('that is not a valid channel or role name.');
+      }
+      break;
+    case 'remove':
+      const roleToRemove = message.guild.roles.filter(i => { return i.name == excludeText || i.id == excludeText; }).first();
+      const channelToRemove = message.guild.channels.filter(i => { return i.name == excludeText || i.id == excludeText; }).first();
+
+      if (input.flags && (input.flags.channel || input.flags.c)) {
+        if (channelToRemove) {
+          updates['logs.excludechannels.' + channelToRemove.id] = undefined;
+        } else {
+          updates['logs.excludechannels.' + excludeText] = undefined;
+        }
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply('`' + excludeText + '` has been removed from the logging exclude list.');
+      } else if (input.flags && (input.flags.role || input.flags.r)) {
+        if (roleToRemove) {
+          updates['logs.excluderoles.' + roleToRemove.id] = undefined;
+        } else {
+          updates['logs.excluderoles.' + excludeText] = undefined;
+        }
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply('`' + excludeText + '` has been removed from the logging exclude list.');
+      } else {
+        // Remove both
+        if (channelToRemove) {
+          updates['logs.excludechannels.' + channelToRemove.id] = undefined;
+        } else {
+          updates['logs.excludechannels.' + excludeText] = undefined;
+        }
+
+        if (roleToRemove) {
+          updates['logs.excluderoles.' + roleToRemove.id] = undefined;
+        } else {
+          updates['logs.excluderoles.' + excludeText] = undefined;
+        }
+
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply('`' + excludeText + '` has been removed from the logging exclude list.');
+      }
+      break;
+    default:
+      break;
+  }
+
+  
+};
+
 const guildUpdateAnnouncementChannel = function(bot, message, input, update) {
   const updates = {};
 
   switch (input.operation) {
     case 'add':
     case 'update':
-      const updateChannel = message.guild.channels.filter(i => { return i.name === update || i.id === update; }).first();
+      const updateChannel = message.guild.channels.filter(i => { return i.name === update || i.id == update; }).first();
 
       if (updateChannel) {
-        updateChannel.send(updateChannel.name + ' registered for guild announcements.')
+        updateChannel.send('#' + updateChannel.name + ' registered for guild announcements.')
           .then(updateChannelMessage => {
             updates['announcements.announcementChannel'] = updateChannel.id;
             serverSettingsManager.updateSettings(message, message.guild.id, updates);
@@ -288,12 +436,12 @@ const displayGuildSettings = function(bot, message, input) {
         for (const j of _.keys(setting)) {
           settingText += '' + j + ': `' + JSON.stringify(setting[j]) + '`\n';
         }
-        embed.addField(i, settingText);
+        embed.addField(i, settingText, true);
       } else {
         if (setting !== undefined) {
-          embed.addField(i, '`' + setting + '`'); 
+          embed.addField(i, '`' + setting + '`', true); 
         } else {
-          embed.addField(i, '_no value set_')
+          embed.addField(i, '_no value set_', true)
         }
       }
     }
@@ -330,6 +478,13 @@ const info = {
       handler: updateGuildSettings,
       usage: {
         'autorole [autorole name] [role name]': 'Adds a new user-selectable autorole. Specify the autorole name (what users will type to gain the role) first, then the name of the role that should be granted.'
+      },
+      flags: {
+        useDefault: null,
+        channel: null,
+        c: null,
+        role: null,
+        r: null
       }
     },
     remove: {
@@ -361,6 +516,10 @@ const info = {
       },
       flags: {
         useDefault: '[prefix] Use the default prefix (' + config.prefix + ') in addition to a custom prefix. true/false',
+        channel: null,
+        c: null,
+        role: null,
+        r: null
       }
     }
   }

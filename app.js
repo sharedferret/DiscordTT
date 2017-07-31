@@ -47,6 +47,12 @@ bot.on('ready', data => {
 
 bot.on('guildCreate', guild => {
   serverSettingsManager.registerServer(guild.id);
+  serverSettingsManager.loadSettings(guild.id);
+
+  // Create database entries for new users
+  for (const [ userId, user ] of guild.members) {
+    userHandler.createUser(user.user, guild.id);
+  }
 });
 
 bot.on('guildMemberAdd', member => {
@@ -59,10 +65,22 @@ bot.on('guildMemberAdd', member => {
     let joinMessage = settings.announcements.userJoin.message;
     joinMessage = joinMessage.replace(/\${username}/g, '<@' + member.id + '>');
 
-    try {
-      member.guild.channels.get(settings.announcements.announcementChannel).send(joinMessage);
-    } catch (e) {
-      console.log(e);
+    const joinChannel = member.guild.channels.get(settings.announcements.announcementChannel)
+    
+    if (joinChannel) {
+      joinChannel.send(joinMessage)
+        .catch(e => { console.log(e); })
+    }
+  }
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel) {
+    const logMessage = `**${member.user.tag}** joined ${member.guild.name}.`;
+    const logChannel = member.guild.channels.get(settings.logs.logChannel)
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
     }
   }
 
@@ -93,6 +111,77 @@ bot.on('guildMemberRemove', member => {
       member.guild.channels.get(settings.announcements.announcementChannel).send(leaveMessage);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel) {
+    const logMessage = `**${member.user.tag}** left ${member.guild.name}.`;
+    const logChannel = member.guild.channels.get(settings.logs.logChannel);
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
+    }
+  }
+});
+
+bot.on('messageDelete', message => {
+  const settings = serverSettingsManager.getSettings(message.guild.id);
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel && !message.author.bot) {
+    const logMessage = `A message by **${message.author.tag}** was deleted from <#${message.channel.id}>.\n\`\`\`\n${message.content}\n\`\`\``;
+    const logChannel = message.guild.channels.get(settings.logs.logChannel);
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
+    }
+  }
+});
+
+bot.on('messageDeleteBulk', messages => {
+  const settings = serverSettingsManager.getSettings(messages.first().guild.id);
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel) {
+    const logMessage = `${messages.size} messages were deleted.`
+    const logChannel = messages.first().guild.channels.get(settings.logs.logChannel);
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
+    }
+  }
+});
+
+bot.on('messageUpdate', (oldMessage, newMessage) => {
+  const settings = serverSettingsManager.getSettings(newMessage.guild.id);
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot) {
+    const logMessage = `A message by **${newMessage.author.tag}** was edited in <#${newMessage.channel.id}>.\n_Old message_\n\`\`\`\n${oldMessage.content}\n\`\`\`\n_New message_\n\`\`\`\n${newMessage.content}\n\`\`\``;
+    const logChannel = newMessage.guild.channels.get(settings.logs.logChannel);
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
+    }
+  }
+});
+
+bot.on('guildBanAdd', (guild, user) => {
+  const settings = serverSettingsManager.getSettings(guild.id);
+
+  // Log event if logging enabled for this server
+  if (settings.logs.enabled && settings.logs.logChannel) {
+    const logMessage = `**${user.tag}** was banned from ${guild.name}.`;
+    const logChannel = guild.channels.get(settings.logs.logChannel);
+    
+    if (logChannel) {
+      logChannel.send(logMessage)
+        .catch(e => { console.log(e); });
     }
   }
 });

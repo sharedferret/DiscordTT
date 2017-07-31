@@ -52,6 +52,20 @@ bot.on('guildCreate', guild => {
 bot.on('guildMemberAdd', member => {
   const settings = serverSettingsManager.getSettings(member.guild.id);
 
+  // Welcome user, if joinMessage is enabled
+  if (settings.announcements.announcementChannel && settings.announcements.userJoin.enabled && 
+    settings.announcements.userJoin.message) {
+
+    let joinMessage = settings.announcements.userJoin.message;
+    joinMessage = joinMessage.replace(/\${username}/g, '<@' + member.id + '>');
+
+    try {
+      member.guild.channels.get(settings.announcements.announcementChannel).send(joinMessage);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   // If autorole is enabled, add the default role to this user
   if (settings.autorole.enabled && settings.autorole.defaultRole) {
     member.addRole(settings.autorole.defaultRole)
@@ -63,6 +77,24 @@ bot.on('guildMemberAdd', member => {
   }
 
   userHandler.createUser(member.user, member.guild.id);
+});
+
+bot.on('guildMemberRemove', member => {
+  const settings = serverSettingsManager.getSettings(member.guild.id);
+  
+  // Announce member's departure, if leaveMessage is enabled
+  if (settings.announcements.announcementChannel && settings.announcements.userLeave.enabled && 
+    settings.announcements.userLeave.message) {
+
+    let leaveMessage = settings.announcements.userLeave.message;
+    leaveMessage = leaveMessage.replace(/\${username}/g, member.user.username);
+
+    try {
+      member.guild.channels.get(settings.announcements.announcementChannel).send(leaveMessage);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 });
 
 // TODO: I hope I don't have to, but TT votes might need to be handled via this

@@ -25,11 +25,112 @@ const updateGuildSettings = function(bot, message, input) {
       case 'defaultrole':
         guildUpdateDefaultRole(bot, message, input, update);
         break;
+      case 'announcementchannel':
+        guildUpdateAnnouncementChannel(bot, message, input, update);
+        break;
+      case 'joinmessage':
+        guildUpdateJoinMessage(bot, message, input, update);
+        break;
+      case 'leavemessage':
+        guildUpdateLeaveMessage(bot, message, input, update);
+        break;
       default:
         return message.reply('please provide a valid setting to update.');
     }
   } else {
     return message.reply('you must be a guild administrator to use this command.');
+  }
+};
+
+const guildUpdateAnnouncementChannel = function(bot, message, input, update) {
+  const updates = {};
+
+  switch (input.operation) {
+    case 'add':
+    case 'update':
+      const updateChannel = message.guild.channels.filter(i => { return i.name === update || i.id === update; }).first();
+
+      if (updateChannel) {
+        updateChannel.send(updateChannel.name + ' registered for guild announcements.')
+          .then(updateChannelMessage => {
+            updates['announcements.announcementChannel'] = updateChannel.id;
+            serverSettingsManager.updateSettings(message, message.guild.id, updates);
+            message.reply('the guild\'s announcement channel has been updated.');
+          })
+          .catch(err => {
+            return message.reply('I wasn\'t able to send a message to that channel. Please check the channel permissions.');
+          });
+      } else {
+        return message.reply('I couldn\'t find that channel.');
+      }
+      break;
+    case 'remove':
+      updates['announcements.announcementChannel'] = undefined;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the guild\'s announcement channel has been cleared.');
+      break;
+    default:
+      break;
+  }
+};
+
+const guildUpdateJoinMessage = function(bot, message, input, update) {
+  const updates = {};
+
+  switch (input.operation) {
+    case 'add':
+    case 'update':
+      updates['announcements.userJoin.message'] = update;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `joinmessage` setting has been updated.');
+      break;
+    case 'remove':
+      updates['announcements.userJoin.message'] = undefined;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `joinmessage` setting has been removed.');
+      break;
+    case 'enable':
+      updates['announcements.userJoin.enabled'] = true;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `joinmessage` feature has been enabled.');
+      break;
+    case 'disable':
+      updates['announcements.userJoin.enabled'] = false;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `joinmessage` feature has been disabled.');
+      break;
+    default:
+      break;
+  }
+};
+
+const guildUpdateLeaveMessage = function(bot, message, input, update) {
+  const updates = {};
+
+  switch (input.operation) {
+    case 'add':
+    case 'update':
+      updates['announcements.userLeave.message'] = update;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `leavemessage` setting has been updated.');
+      break;
+    case 'remove':
+      updates['announcements.userLeave.message'] = undefined;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `leavemessage` setting has been removed.');
+      break;
+    case 'enable':
+      updates['announcements.userLeave.enabled'] = true;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `leavemessage` feature has been enabled.');
+      break;
+    case 'disable':
+      updates['announcements.userLeave.enabled'] = false;
+      serverSettingsManager.updateSettings(message, message.guild.id, updates);
+      message.reply('the `leavemessage` feature has been disabled.');
+      break;
+    default:
+      break;
   }
 };
 
@@ -70,7 +171,7 @@ const guildUpdateAutorole = function(bot, message, input, update) {
     case 'update':
       const autoRoleName = update.substring(0, update.indexOf(' '));
       const guildRoleName = update.substring(update.indexOf(' ') + 1, update.length);
-      const guildRole = message.guild.roles.filter(function(i) { return i.name === guildRoleName; }).first();
+      const guildRole = message.guild.roles.filter(i => { return i.name === guildRoleName; }).first();
 
       // TODO: Attempt to grant this role to the bot (to ensure it has permissions to do so)
 
@@ -203,6 +304,7 @@ const displayGuildSettings = function(bot, message, input) {
   }
 };
 
+// TODO: Fix the RichEmbed 1024 char limit issue with command help pages. Not sure how yet.
 const info = {
   name: ['settings'],
   description: 'View and update guild settings.',
@@ -252,11 +354,13 @@ const info = {
       handler: updateGuildSettings,
       usage: {
         'prefix [new prefix]': 'Sets a new guild-specific command prefix.',
-        'defaultrole [new role]': 'Sets a default role that users will be assigned when joining the server.'
+        'defaultrole [new role]': 'Sets a default role that users will be assigned when joining the server.',
+//        'joinmessage [message]': 'Sets the message that will be sent to the announcement channel when a user joins the server. Use ${username} to mention the user.',
+//        'leavemessage [message]': 'Sets the message that will be sent to the announcement channel when a user leaves the server. Use ${username} to mention the user.',
+//        'announcementchannel [channel name]': 'Sets the channel announcements will be sent to.'
       },
       flags: {
         useDefault: '[prefix] Use the default prefix (' + config.prefix + ') in addition to a custom prefix. true/false',
-        clear: 'Clear the guild\'s custom value for this setting.'
       }
     }
   }

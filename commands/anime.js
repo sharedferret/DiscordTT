@@ -133,7 +133,7 @@ const respondWithMalOutput = function(message, result, searchString) {
 
 const limiter = RateLimiter({
   namespace: 'UserRateLimit:anime:',
-  interval: 300000,
+  interval: 180000,
   maxInInterval: 5,
   minDifference: 3000,
   storeBlocked: false

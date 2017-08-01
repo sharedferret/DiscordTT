@@ -53,7 +53,7 @@ const retrieveWeather = function(bot, message, input, metadata) {
     if (!metadata) {
       if (global.locationCache[searchParameters]) {
         console.log('Using cached location data');
-        retrieveWeather_DarkSky(bot, message, global.locationCache[searchParameters]);
+        retrieveWeather_DarkSky(bot, message, input, global.locationCache[searchParameters]);
       } else {
         console.log('Calling Google for geocode');
 
@@ -92,11 +92,11 @@ const retrieveWeather = function(bot, message, input, metadata) {
           // Add to cache
           global.locationCache[searchParameters] = metadata;
 
-          retrieveWeather_DarkSky(bot, message, metadata);
+          retrieveWeather_DarkSky(bot, message, input, metadata);
         });
       }
     } else {
-      retrieveWeather_DarkSky(bot, message, metadata);
+      retrieveWeather_DarkSky(bot, message, input, metadata);
     }
   } else {
     retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
@@ -153,13 +153,25 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
     });
 };
 
-const retrieveWeather_DarkSky = function(bot, message, metadata) {
+const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
+  let units = 'auto';
+
+  if (input.flags && input.flags.units) {
+    if (input.flags.units == 'local') units = 'auto';
+    if (input.flags.units == 'us') units = 'us';
+    if (input.flags.units == 'uk') units = 'uk2';
+    if (input.flags.units == 'ca') units = 'ca';
+    if (input.flags.units == 'si') units = 'si';
+  }
+
   forecast
     .latitude(metadata.location.coordinates.latitude)
     .longitude(metadata.location.coordinates.longitude)
-    .units('us')
+    .units(units)
     .get()
     .then(res => {
+      units = res.flags.units;
+
       const embed = Utils.createEmbed(message, 'Dark Sky');
 
       // TODO: Fix this once we add alternate ways of geocoding
@@ -189,15 +201,35 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
         icon = res.currently.icon;
       }
 
-      embed.addField('Conditions', icon + ' ' + res.currently.summary, true);
-      embed.addField('Temperature', Math.round(res.currently.temperature) + '°F (Feels Like ' + Math.round(res.currently.apparentTemperature) + '°F)', true);
-      embed.addField('Humidity', (res.currently.humidity * 100).toFixed(0) + '%', true);
-      embed.addField('Visibility', res.currently.visibility + ' miles', true);
-      embed.addField('Wind', Utils.emojiForDirection(res.currently.windBearing) + ' ' + res.currently.windSpeed + ' mph', true);
-      embed.addField('Pressure', Utils.hpaToInhg(res.currently.pressure).toFixed(2) + ' inHg', true);
+      embed.addField('Conditions', `${icon} ${res.currently.summary}`, true);
+      embed.addField('Temperature', `${Math.round(res.currently.temperature)}${Utils.unitSymbols[units].temperature} (Feels Like ${Math.round(res.currently.apparentTemperature)}${Utils.unitSymbols[units].temperature})`, true);
+      embed.addField('Humidity', `${(res.currently.humidity * 100).toFixed(0)}%`, true);
+
+      if (res.currently.visibility) {
+        embed.addField('Visibility', `${res.currently.visibility} ${Utils.unitSymbols[units].distance}`, true);
+      }
+
+      embed.addField('Wind', `${Utils.emojiForDirection(res.currently.windBearing)} ${res.currently.windSpeed.toFixed(1)} ${Utils.unitSymbols[units].speed}`, true);
+
+      switch (units) {
+        case 'us':
+          embed.addField('Pressure', `${Utils.hpaToInhg(res.currently.pressure).toFixed(2)} inHg`, true);
+          break;
+        case 'ca':
+        embed.addField('Pressure', `${(res.currently.pressure / 10).toFixed(2)} kPa`, true);
+          break;
+        case 'uk2':
+        embed.addField('Pressure', `${res.currently.pressure.toFixed(2)} mb`, true);
+          break;
+        case 'si':
+        embed.addField('Pressure', `${res.currently.pressure.toFixed(2)} hPa`, true);
+          break;
+        default:
+          break;
+      }
 
       if (res.currently.nearestStormDistance && res.currently.nearestStormBearing) {
-        embed.addField('Nearest Storm', Utils.emojiForDirection(res.currently.nearestStormBearing) + ' ' + res.currently.nearestStormDistance + ' miles', true);
+        embed.addField('Nearest Storm', `${Utils.emojiForDirection(res.currently.nearestStormBearing)} ${res.currently.nearestStormDistance} ${Utils.unitSymbols[units].distance}`, true);
       }
 
       if (res.currently.uvIndex) {
@@ -224,7 +256,7 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
           alertText += alert.title;
 
           if (alert.expires) {
-            alertText += ' (Until ' + moment(alert.expires * 1000).tz(res.timezone).format('MMMM Do, h:mm a') + ')';
+            alertText += ' (Until ' + moment(alert.expires * 1000).tz(res.timezone).format(Utils.unitSymbols[units].dateShort + ', ' + Utils.unitSymbols[units].time) + ')';
           }
 
           alertText += '\n';
@@ -243,7 +275,7 @@ const retrieveWeather_DarkSky = function(bot, message, metadata) {
 
 const limiter = RateLimiter({
   namespace: 'UserRateLimit:weather:',
-  interval: 300000,
+  interval: 180000,
   maxInInterval: 5,
   minDifference: 3000,
   storeBlocked: false
@@ -262,6 +294,7 @@ const info = {
         '': 'This command will use the location saved in your profile.'
       },
       flags: {
+        units: 'Specify what units this command should use: local/us/uk/ca/si',
         owm: 'Use data from the OpenWeatherMap API.',
         darksky: 'Use data from the Dark Sky API (if available/permitted).'
       }

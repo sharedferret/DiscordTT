@@ -15,7 +15,7 @@ const handleMessage = function(bot, message, input) {
       const searchParameters = input.input;
 
       if (global.locationCache[searchParameters]) {
-        retrieveForecast(bot, message, global.locationCache[searchParameters]);
+        retrieveForecast(bot, message, input, global.locationCache[searchParameters]);
       } else {
         gmapsClient.geocode({
           address: searchParameters
@@ -50,7 +50,7 @@ const handleMessage = function(bot, message, input) {
           // Add to cache
           global.locationCache[searchParameters] = metadata;
 
-          retrieveForecast(bot, message, metadata);
+          retrieveForecast(bot, message, input, metadata);
         });
       }
     } else {
@@ -59,7 +59,7 @@ const handleMessage = function(bot, message, input) {
           const metadata = JSON.parse(profile.metadata);
 
           if (metadata && metadata.location) {
-            retrieveForecast(bot, message, metadata);
+            retrieveForecast(bot, message, input, metadata);
           } else {
             message.reply('your profile doesn\'t have a location. Set one by typing `' + Utils.getPrefix(message.guild ? message.guild.id : null) + 'profile set location YOUR_LOCATION`.');
           }
@@ -73,13 +73,25 @@ const handleMessage = function(bot, message, input) {
   }
 };
 
-const retrieveForecast = function(bot, message, metadata) {
+const retrieveForecast = function(bot, message, input, metadata) {
+  let units = 'auto';
+
+  if (input.flags && input.flags.units) {
+    if (input.flags.units == 'local') units = 'auto';
+    if (input.flags.units == 'us') units = 'us';
+    if (input.flags.units == 'uk') units = 'uk2';
+    if (input.flags.units == 'ca') units = 'ca';
+    if (input.flags.units == 'si') units = 'si';
+  }
+
   forecast
     .latitude(metadata.location.coordinates.latitude)
     .longitude(metadata.location.coordinates.longitude)
-    .units('us')
+    .units(units)
     .get()
     .then(res => {
+      units = res.flags.units;
+
       const embed = Utils.createEmbed(message, 'Dark Sky');
 
       const country = countryData.countries[metadata.location.country];
@@ -102,10 +114,16 @@ const retrieveForecast = function(bot, message, metadata) {
 
       embed.setTitle(country.emoji + ' Forecast for ' + locationString + ' (' + Utils.formatLatitude(res.latitude) + ', ' + Utils.formatLongitude(res.longitude) + ')');
 
-      for (let i = 0; i < 3; i++) {
+      let days = 3;
+
+      if (input.flags && input.flags.days && input.flags.days > 0 && input.flags.days <= 7) {
+        days = input.flags.days;
+      }
+
+      for (let i = 0; i < days; i++) {
         const dailyWeather = res.daily.data[i];
 
-        const day = moment(dailyWeather.time * 1000).tz(res.timezone).format('dddd, MMMM Do YYYY');
+        const day = moment(dailyWeather.time * 1000).tz(res.timezone).format(Utils.unitSymbols[units].date);
 
         let weatherString = '';
 
@@ -115,11 +133,9 @@ const retrieveForecast = function(bot, message, metadata) {
           weatherIcon = dailyWeather.icon;
         }
 
-        weatherString += weatherIcon + ' ' + dailyWeather.summary + '\nHigh: ' + 
-          dailyWeather.temperatureMax.toFixed(0) + '°F, Low: ' +
-          dailyWeather.temperatureMin.toFixed(0) + '°F\nSunrise: ' + 
-          moment(dailyWeather.sunriseTime * 1000).tz(res.timezone).format('h:mm a') + ', Sunset: ' +
-          moment(dailyWeather.sunsetTime * 1000).tz(res.timezone).format('h:mm a');
+        weatherString += `${weatherIcon} ${dailyWeather.summary}\n`;
+        weatherString += `High: ${dailyWeather.temperatureMax.toFixed(0)}${Utils.unitSymbols[units].temperature}, Low: ${dailyWeather.temperatureMin.toFixed(0)}${Utils.unitSymbols[units].temperature}\n`;
+        weatherString += `Sunrise: ${moment(dailyWeather.sunriseTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}, Sunset: ${moment(dailyWeather.sunsetTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}`;
 
         embed.addField(day, weatherString);
       }
@@ -144,7 +160,7 @@ const retrieveForecast = function(bot, message, metadata) {
           alertText += alert.title;
 
           if (alert.expires) {
-            alertText += ' (Until ' + moment(alert.expires * 1000).tz(res.timezone).format('MMMM Do, h:mm a') + ')';
+            alertText += ' (Until ' + moment(alert.expires * 1000).tz(res.timezone).format(Utils.unitSymbols[units].dateShort + ', ' + Utils.unitSymbols[units].time) + ')';
           }
 
           alertText += '\n';
@@ -173,7 +189,7 @@ const requestIsEligible = function(message) {
 
 const limiter = RateLimiter({
   namespace: 'UserRateLimit:forecast:',
-  interval: 300000,
+  interval: 180000,
   maxInInterval: 5,
   minDifference: 3000,
   storeBlocked: false
@@ -190,6 +206,10 @@ const info = {
       usage: {
         '[location]': 'This command accepts most location identifiers, including town names and postcodes.',
         '': 'This command will use the location saved in your profile.'
+      },
+      flags: {
+        units: 'Specify what units this command should use: local/us/uk/ca/si',
+        days: 'How many days should be displayed (1-7)'
       }
     }
   },

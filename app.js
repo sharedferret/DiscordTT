@@ -55,6 +55,10 @@ bot.on('guildCreate', guild => {
   }
 });
 
+bot.on('guildDelete', guild => {
+  serverSettingsManager.deregisterServer(guild.id);
+});
+
 bot.on('guildMemberAdd', member => {
   const settings = serverSettingsManager.getSettings(member.guild.id);
 
@@ -74,6 +78,8 @@ bot.on('guildMemberAdd', member => {
   }
 
   // Log event if logging enabled for this server
+  // TODO: Make generic logging handler file
+  // TODO: Don't log if it's in an excluded role/channel
   if (settings.logs.enabled && settings.logs.logChannel) {
     const logMessage = `**${member.user.tag}** joined ${member.guild.name}.`;
     const logChannel = member.guild.channels.get(settings.logs.logChannel)

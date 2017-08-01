@@ -94,7 +94,7 @@ const listSubreddits = function(message) {
 
 const limiter = RateLimiter({
   namespace: 'UserRateLimit:awwnime:',
-  interval: 300000,
+  interval: 180000,
   maxInInterval: 5,
   minDifference: 3000,
   storeBlocked: false

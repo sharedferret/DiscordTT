@@ -99,7 +99,7 @@ const revokeRole = function(bot, message, input) {
 };
 
 const info = {
-  name: ['role', 'roles'],
+  name: ['role', 'roles', 'autorole'],
   description: 'Gives a guild-specific autorole to a user.',
   operations: {
     _default: {

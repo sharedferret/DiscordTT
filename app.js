@@ -130,7 +130,7 @@ bot.on('messageDelete', message => {
   const settings = serverSettingsManager.getSettings(message.guild.id);
 
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel && !message.author.bot) {
+  if (settings.logs.enabled && settings.logs.logChannel && !message.author.bot && message.channel.id !== settings.log.logChannel) {
     const logMessage = `A message by **${message.author.tag}** was deleted from <#${message.channel.id}>.\n\`\`\`\n${message.content}\n\`\`\``;
     const logChannel = message.guild.channels.get(settings.logs.logChannel);
     
@@ -160,7 +160,7 @@ bot.on('messageUpdate', (oldMessage, newMessage) => {
   const settings = serverSettingsManager.getSettings(newMessage.guild.id);
 
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot) {
+  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot && message.channel.id !== settings.log.logChannel) {
     const logMessage = `A message by **${newMessage.author.tag}** was edited in <#${newMessage.channel.id}>.\n_Old message_\n\`\`\`\n${oldMessage.content}\n\`\`\`\n_New message_\n\`\`\`\n${newMessage.content}\n\`\`\``;
     const logChannel = newMessage.guild.channels.get(settings.logs.logChannel);
     

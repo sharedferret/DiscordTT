@@ -166,7 +166,10 @@ bot.on('messageUpdate', (oldMessage, newMessage) => {
   const settings = serverSettingsManager.getSettings(newMessage.guild.id);
 
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot && message.channel.id !== settings.log.logChannel) {
+  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot 
+    && newMessage.channel.id !== settings.logs.logChannel
+    && newMessage.content != oldMessage.content) {
+      
     const logMessage = `A message by **${newMessage.author.tag}** was edited in <#${newMessage.channel.id}>.\n_Old message_\n\`\`\`\n${oldMessage.content}\n\`\`\`\n_New message_\n\`\`\`\n${newMessage.content}\n\`\`\``;
     const logChannel = newMessage.guild.channels.get(settings.logs.logChannel);
     

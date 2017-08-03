@@ -89,7 +89,29 @@ const displayCommandPage = function(bot, message, commandName) {
     });
 
     if (usage.length > 0) {
-      embed.addField('Usage', usage.join('\n'));
+      const usageParts = [[]];
+      const usageLengths = [0];
+      let idx = 0;
+      for (const i of usage) {
+        if (usageLengths[idx] + i.length < 1000) {
+          usageParts[idx].push(i);
+          usageLengths[idx] += i.length;
+        } else {
+          idx++;
+          usageLengths[idx] = 0;
+          usageParts[idx] = [];
+          usageParts[idx].push(i);
+          usageLengths[idx] += i.length;
+        }
+      }
+
+      for (const index in usageParts) {
+        if (index == 0) {
+          embed.addField('Usage', usageParts[index].join('\n'));
+        } else {
+          embed.addField('\u200B', usageParts[index].join('\n'));
+        } 
+      }
     }
     
     if (flags.length > 0) {

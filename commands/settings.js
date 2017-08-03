@@ -6,7 +6,7 @@ const checkUpdateRestrictions = function(bot, message, input) {
     return false;
   }
 
-  if (message.member.hasPermission('ADMINISTRATOR')) {
+  if (Utils.isGuildAdmin(message.member)) {
     return true;
   } else {
     message.reply('you must be a guild administrator to use this command.');
@@ -37,6 +37,11 @@ const guildUpdateAutorole = function(bot, message, input) {
       const autoRoleName = update.substring(0, update.indexOf(' '));
       const guildRoleName = update.substring(update.indexOf(' ') + 1, update.length);
       const guildRole = message.guild.roles.filter(i => { return i.name === guildRoleName; }).first();
+
+      // Make sure autoRoleName is a single word
+      if (!autoRoleName.match(/^[A-Za-z0-9]+$/)) {
+        return message.reply('please make sure your autorole name contains only letters and numbers.')
+      }
 
       // TODO: Attempt to grant this role to the bot (to ensure it has permissions to do so)
 

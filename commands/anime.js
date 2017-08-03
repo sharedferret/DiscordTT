@@ -8,11 +8,19 @@ const handleMessage = function(bot, message, input) {
     return message.reply('please provide an anime title to search for.');
   }
 
-  // searchWithKitsu(bot, message, searchString);
-  searchWithMal(bot, message, input.input);
+  if (input.flags && input.flags.kitsu) {
+    searchWithKitsu(bot, message, input);
+  } else if (input.flags && input.flags.mal) {
+    searchWithMal(bot, message, input);
+  } else {
+    searchWithKitsu(bot, message, input);
+    // searchWithMal(bot, message, input);
+  }
 };
 
-const searchWithKitsu = function(bot, message, searchString) {
+const searchWithKitsu = function(bot, message, input) {
+  const searchString = input.input;
+
   request({
     url: 'https://kitsu.io/api/edge/anime?filter%5btext%5d=' + encodeURIComponent(searchString) + '&page%5blimit%5d=1',
   }, function(err, response, body) {
@@ -72,7 +80,9 @@ const respondWithKitsuOutput = function(message, result) {
   });
 };
 
-const searchWithMal = function(bot, message, searchString) {
+const searchWithMal = function(bot, message, input) {
+  const searchString = input.input;
+
   request('https://myanimelist.net/search/prefix.json?type=anime&keyword=' + encodeURIComponent(searchString),
   function(err, response, body) {
     try {
@@ -148,6 +158,10 @@ const info = {
       handler: handleMessage,
       usage: {
         '[search string]': 'Search for and display information about an anime.'
+      },
+      flags: {
+        kitsu: 'Search using kitsu.io',
+        mal: 'Search using MyAnimeList.net'
       }
     }
   },

@@ -1,4 +1,3 @@
-const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
 
 const handleMessage = function(bot, message, input) {
@@ -6,24 +5,24 @@ const handleMessage = function(bot, message, input) {
   
   embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setThumbnail(bot.user.avatarURL);
-  embed.setDescription('Tohru is a music-focused bot bringing a Turntable.fm-style experience to Discord.');
+  embed.setDescription('Tohru is a Discord bot with an extensive list of commands, including server ' +
+    'moderation and a music DJing feature based on Turntable.fm. Type ' +
+    Utils.createCommandWithPrefix('help', message.guild ? message.guild.id : null) + ' to see the commands I support.');
 
-  embed.addField('Development/Support Server', 'http://discord.tohru.club/', true);
+  if (global.gitRev) {
+    embed.addField('Version', `${pkg.version} (${global.gitRev})`, true);
+  } else {
+    embed.addField('Version', pkg.version, true);
+  }
+  
+  embed.addField('Creator', 'Yui#1441', true);
   embed.addField('Invite Link', 'http://invite.tohru.club/', true);
+  embed.addField('Dev/Support Server', 'http://discord.tohru.club/', true);
+  embed.addField('Servers', bot.guilds.size, true);
+  embed.addField('Users', bot.users.size, true);
+  embed.addField('Uptime', moment.duration(process.uptime() * 1000).format('d[d] h[h] m[m] s[s]'), true);
 
-  // TODO: This retrieves the current git-rev. Instead, run this at bot startup and cache the value.
-  git.short(function(rev) {
-    if (rev) {
-      embed.addField('Version', rev + ' (' + pkg.version + ')');
-    } else {
-      embed.addField('Version', pkg.version);
-    }
-    
-    embed.addField('Servers', bot.guilds.size);
-    embed.addField('Users', bot.users.size);
-
-    message.channel.send('', { embed: embed });
-  });
+  message.channel.send('', { embed: embed });
 };
 
 const info = {

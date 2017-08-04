@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const git = require('git-rev');
 const appRoot = path.resolve(__dirname);
 
 global.config = require('./config');
@@ -22,3 +23,6 @@ global.Utils = require(global.paths.lib + 'utils');
 // Local cache for Google geocoding responses, better than nothing
 // TODO [#60]: Replace with redis
 global.locationCache = {};
+
+global.gitRev = '';
+git.short(rev => { if (rev) global.gitRev = rev; });

@@ -5,6 +5,7 @@ const google = require('googleapis');
 const youtube = google.youtube('v3');
 const uuid = require('uuid/v4');
 const url = require('url');
+const RateLimiter = require(global.paths.lib + 'rate-limiter');
 
 const handleMessage = function(bot, message, input) {
   const searchParameters = input.input;
@@ -112,6 +113,14 @@ const addYoutubeVideo = function(bot, message, videoId) {
   });
 };
 
+const limiter = RateLimiter({
+  namespace: 'UserRateLimit:qadd:',
+  interval: 180000,
+  maxInInterval: 20,
+  minDifference: 2500,
+  storeBlocked: false
+});
+
 const info = {
   name: ['q+'],
   description: 'Adds a song to your current playlist\'s queue.',
@@ -125,7 +134,8 @@ const info = {
         '[Youtube Video URL]': 'Adds the given Youtube video to your queue.'
       }
     }
-  }
+  },
+  rateLimiter: limiter
 };
 
 module.exports = {

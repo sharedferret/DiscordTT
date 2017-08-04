@@ -16,7 +16,6 @@ const handleMessage = function(bot, message, input) {
   if (state) {
     db.serialize(function() {
       //TODO: Fix
-      console.log('IDs', state.djs.map(function(i) { return i.id; }).join(','));
       db.all('SELECT id, points FROM User WHERE id IN (' + state.djs.map(function(i) { return i.id; }).join(',') + ')', [],
         function(err, result) {
           if (err) console.log(err);

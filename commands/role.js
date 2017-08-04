@@ -58,7 +58,7 @@ const grantRole = function(bot, message, input) {
         return message.reply('you\'ve been granted the ' + role.name + ' role!');
       })
       .catch(err => {
-        // TODO: This will likely be a permission error
+        // TODO [#58]: This will likely be a permission error
         console.warn(err);
         return message.reply('I wasn\'t able to add that role, sorry!');
       });
@@ -89,7 +89,7 @@ const revokeRole = function(bot, message, input) {
         return message.reply('you no longer have the ' + role.name + ' role.');
       })
       .catch(err => {
-        // TODO: This will likely be a permission error
+        // TODO [#58]: This will likely be a permission error
         console.warn(err);
         return message.reply('I wasn\'t able to remove that role, sorry!');
       });

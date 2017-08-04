@@ -20,5 +20,5 @@ global.CommandType = require(global.paths.lib + 'commandtypes');
 global.Utils = require(global.paths.lib + 'utils');
 
 // Local cache for Google geocoding responses, better than nothing
-// TODO: Replace with redis
+// TODO [#60]: Replace with redis
 global.locationCache = {};

@@ -14,7 +14,6 @@ const handleMessage = function(bot, message, input) {
     return message.reply('no results found.');
   }
 
-  // TODO: Auto-add song if a full Youtube URL was provided
   const messageUrl = url.parse(searchParameters);
 
   if (messageUrl.host && messageUrl.host.indexOf('youtube.com') > -1 && messageUrl.query && messageUrl.query.indexOf('v=') > -1) {

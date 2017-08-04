@@ -85,9 +85,9 @@ bot.on('guildMemberAdd', member => {
   if (settings.autorole.enabled && settings.autorole.defaultRole) {
     member.addRole(settings.autorole.defaultRole)
       .catch(err => {
-        // TODO: This will likely be a permission error - the bot needs to remove the role
+        // TODO [#58]: This will likely be a permission error - the bot needs to remove the role
         // and fire an alert to a logging channel
-        console.warn(err);
+        console.log(err);
       });
   }
 

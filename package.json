@@ -1,7 +1,7 @@
 {
 	"name": "discord-tt",
 	"version": "0.7.10",
-	"description": "Music bot for discord rooms",
+	"description": "Moderation and music bot for discord servers",
 	"main": "./app.js",
 	"repository": {
 		"type": "git",

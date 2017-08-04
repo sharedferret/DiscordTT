@@ -57,7 +57,7 @@ const retrieveWeather = function(bot, message, input, metadata) {
       } else {
         console.log('Calling Google for geocode');
 
-        // TODO: Cache this result
+        // TODO [#60]: Cache this result
         gmapsClient.geocode({
           address: searchParameters
         }, function(err, response) {
@@ -142,10 +142,6 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
       }
       embed.addField('Wind', Utils.emojiForDirection(weather.wind.deg) + ' ' + Utils.mpsToMph(weather.wind.speed).toFixed() + ' mph (' + Utils.mpsToKph(weather.wind.speed).toFixed() + ' kph)', true);
       embed.addField('Pressure', Utils.hpaToInhg(weather.main.pressure).toFixed(2) + ' inches', true);
-      
-      // TODO: This API is using fucking UTC without providing a local time offset
-      // embed.addField('Sunrise', ':sunrise: ' + ' ' + sunrise.format('h:mm a'), true);
-      // embed.addField('Sunset', ':city_sunset: ' + ' ' + sunset.format('h:mm a'), true);
 
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + weather.coord.lat + ',' + weather.coord.lon + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
 
@@ -173,8 +169,6 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
       units = res.flags.units;
 
       const embed = Utils.createEmbed(message, 'Dark Sky');
-
-      // TODO: Fix this once we add alternate ways of geocoding
       const country = countryData.countries[metadata.location.country];
 
       let locationString = '';

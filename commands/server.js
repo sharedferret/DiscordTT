@@ -100,7 +100,7 @@ const handleMessage = function(bot, message, input) {
       }
       voiceChannelArray[channel.position].push(channel.name);
     } else {
-      // TODO: only add text channel if the bot has Read Messages permissions for it
+      // TODO [#61]: only add text channel if the bot has Read Messages permissions for it
       // TODO: add Main Channel
 
       if (!textChannelArray[channel.position]) {

@@ -21,8 +21,8 @@ const handleMessage = function(bot, message, input) {
     return addYoutubeVideo(bot, message, videoId);
   }
 
-  // TODO: Cache this response if possible, since it uses 100 units per search request
-  // TODO: Grab contentDetails since it's only an extra 3 units
+  // TODO [#60]: Cache this response if possible, since it uses 100 units per search request
+  // TODO [#59]: Grab contentDetails since it's only an extra 3 units
   youtube.search.list({
     key: config.api.google,
     part: 'snippet',
@@ -87,9 +87,6 @@ const handleActiveRequest = function(bot, message, request) {
     // Get YT ID for this result
     const item = request.data[parseInt(message.content) - 1];
     if (item) {
-      // queueHandler.queueSong(bot, message, item);
-
-      // TODO: Play immediately
       tt.playUnqueuedSong(bot, message.guild.id, message, item);
 
       // Remove this request from the active queue
@@ -111,8 +108,6 @@ const addYoutubeVideo = function(bot, message, videoId) {
     }
 
     if (response.items[0]) {
-      // queueHandler.queueSong(bot, message, response.items[0]);
-      // TODO: Play immediately
       tt.playUnqueuedSong(bot, message.guild.id, message, response.items[0]);
     }
   });

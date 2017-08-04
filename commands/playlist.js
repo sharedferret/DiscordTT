@@ -10,7 +10,6 @@ const addPlaylist = function(bot, message, input) {
   const playlistName = input.input;
 
   if (!playlistName) {
-    // TODO: Generate a playlist name in this situation
     return message.reply('please provide a name for this playlist!');
   }
 

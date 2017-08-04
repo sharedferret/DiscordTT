@@ -222,7 +222,7 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
           break;
       }
 
-      if (res.currently.nearestStormDistance && res.currently.nearestStormBearing) {
+      if (res.currently.nearestStormDistance && res.currently.nearestStormBearing && res.currently.nearestStormDistance < 100) {
         embed.addField('Nearest Storm', `${Utils.emojiForDirection(res.currently.nearestStormBearing)} ${res.currently.nearestStormDistance} ${Utils.unitSymbols[units].distance}`, true);
       }
 

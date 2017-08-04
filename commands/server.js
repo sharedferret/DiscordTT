@@ -1,4 +1,5 @@
 const moment = require('moment');
+const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 
 const MESSAGE_CHARACTER_LIMIT = 1020;
 
@@ -100,18 +101,23 @@ const handleMessage = function(bot, message, input) {
       }
       voiceChannelArray[channel.position].push(channel.name);
     } else {
-      // TODO [#61]: only add text channel if the bot has Read Messages permissions for it
-      // TODO: add Main Channel
-
       if (!textChannelArray[channel.position]) {
         textChannelArray[channel.position] = [];
       }
-      textChannelArray[channel.position].push(channel.name);
+      textChannelArray[channel.position].push(channel);
     }
   }
 
   if (textChannelArray.length > 0) {
-    const textChannels = _.compact(_.flatten(textChannelArray));
+    const settings = serverSettingsManager.getSettings(message.guild.id);
+
+    const textChannels = _.compact(_.flatten(textChannelArray)).filter(channel => {
+      if (settings && settings.logs && settings.logs.excludechannels && settings.logs.excludechannels[channel.id] !== undefined) {
+        return false;
+      }
+      return message.guild.me.permissionsIn(channel).has('READ_MESSAGES')
+    }).map(i => { return i.name; });
+
     let textChannelsText = textChannels.join(', ');
 
     if (textChannelsText.length > MESSAGE_CHARACTER_LIMIT) {

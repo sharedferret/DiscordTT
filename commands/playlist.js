@@ -95,11 +95,17 @@ const info = {
         '[Youtube playlist URL]': 'Create a new playlist from a Youtube playlist.'
       }
     },
+    create: {
+      handler: addPlaylist
+    },
     delete: {
       handler: deletePlaylist,
       usage: {
         '[playlist name or ID]': 'Delete a playlist with the given name or ID.'
       }
+    },
+    remove: {
+      handler: deletePlaylist
     },
     select: {
       handler: selectPlaylist,

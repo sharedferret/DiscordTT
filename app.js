@@ -10,6 +10,7 @@ const dbClient = require(global.paths.lib + 'database-client');
 const redisClient = require(global.paths.lib + 'redis-client');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const userHandler = require(global.paths.lib + 'user-handler');
+const guildLogger = require(global.paths.lib + 'guild-logging-handler');
 require(global.paths.lib + 'turntable-handler');
 
 bot.on('message', message => {
@@ -78,17 +79,7 @@ bot.on('guildMemberAdd', member => {
   }
 
   // Log event if logging enabled for this server
-  // TODO: Make generic logging handler file
-  // TODO: Don't log if it's in an excluded role/channel
-  if (settings.logs.enabled && settings.logs.logChannel) {
-    const logMessage = `**${member.user.tag}** joined ${member.guild.name}.`;
-    const logChannel = member.guild.channels.get(settings.logs.logChannel)
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('guildMemberAdd', member.guild, member, { member: member });
 
   // If autorole is enabled, add the default role to this user
   if (settings.autorole.enabled && settings.autorole.defaultRole) {
@@ -121,78 +112,27 @@ bot.on('guildMemberRemove', member => {
   }
 
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel) {
-    const logMessage = `**${member.user.tag}** left ${member.guild.name}.`;
-    const logChannel = member.guild.channels.get(settings.logs.logChannel);
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('guildMemberRemove', member.guild, member, { member: member });
 });
 
 bot.on('messageDelete', message => {
-  const settings = serverSettingsManager.getSettings(message.guild.id);
-
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel && !message.author.bot && message.channel.id !== settings.log.logChannel) {
-    const logMessage = `A message by **${message.author.tag}** was deleted from <#${message.channel.id}>.\n\`\`\`\n${message.content}\n\`\`\``;
-    const logChannel = message.guild.channels.get(settings.logs.logChannel);
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('messageDelete', message.guild, message.member, { message: message });
 });
 
 bot.on('messageDeleteBulk', messages => {
-  const settings = serverSettingsManager.getSettings(messages.first().guild.id);
-
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel) {
-    const logMessage = `${messages.size} messages were deleted.`
-    const logChannel = messages.first().guild.channels.get(settings.logs.logChannel);
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('messageDeleteBulk', messages.first().guild, null, { messages: messages });
 });
 
 bot.on('messageUpdate', (oldMessage, newMessage) => {
-  const settings = serverSettingsManager.getSettings(newMessage.guild.id);
-
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel && !newMessage.author.bot 
-    && newMessage.channel.id !== settings.logs.logChannel
-    && newMessage.content != oldMessage.content) {
-      
-    const logMessage = `A message by **${newMessage.author.tag}** was edited in <#${newMessage.channel.id}>.\n_Old message_\n\`\`\`\n${oldMessage.content}\n\`\`\`\n_New message_\n\`\`\`\n${newMessage.content}\n\`\`\``;
-    const logChannel = newMessage.guild.channels.get(settings.logs.logChannel);
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('messageUpdate', oldMessage.guild, oldMessage.member, { oldMessage: oldMessage, newMessage: newMessage });
 });
 
 bot.on('guildBanAdd', (guild, user) => {
-  const settings = serverSettingsManager.getSettings(guild.id);
-
   // Log event if logging enabled for this server
-  if (settings.logs.enabled && settings.logs.logChannel) {
-    const logMessage = `**${user.tag}** was banned from ${guild.name}.`;
-    const logChannel = guild.channels.get(settings.logs.logChannel);
-    
-    if (logChannel) {
-      logChannel.send(logMessage)
-        .catch(e => { console.log(e); });
-    }
-  }
+  guildLogger.logEvent('guildBanAdd', guild, null, { user: user });
 });
 
 // TODO: I hope I don't have to, but TT votes might need to be handled via this

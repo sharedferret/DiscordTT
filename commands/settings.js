@@ -348,6 +348,49 @@ const guildUpdateLogging = function(bot, message, input) {
   }
 };
 
+const guildUpdateTt = (bot, message, input) => {
+  if (!checkUpdateRestrictions(bot, message, input)) return;
+  const cmd = input.input.split(' ');
+  const setting = cmd.shift();
+  const update = cmd.join(' ');
+  const updates = {};
+
+  switch(setting) {
+    case 'djlimit':
+      const maxDjs = parseInt(update, 10);
+
+      if (maxDjs && maxDjs > 0 && maxDjs <= 10) {
+        updates['ttPlugin.maxDjs'] = maxDjs;
+        serverSettingsManager.updateSettings(message, message.guild.id, updates);
+        message.reply(`the max DJs setting has been updated to ${maxDjs}.`);
+      } else {
+        message.reply('please provide a valid number (between 1 and 10) for this setting.');
+      }
+      break;
+    case 'songlimit':
+      const songLimit = update == 'none' ? 0 : parseInt(update, 10);
+
+      if (!isNaN(songLimit)) {
+        if (songLimit == 0) {
+          updates['ttPlugin.songsPerDj'] = null;
+          serverSettingsManager.updateSettings(message, message.guild.id, updates);
+          message.reply('the song limit setting has been updated to `none`.');
+        } else if (songLimit > 0) {
+          updates['ttPlugin.songsPerDj'] = songLimit;
+          serverSettingsManager.updateSettings(message, message.guild.id, updates);
+          message.reply(`the song limit setting has been updated to ${songLimit}.`);
+        } else {
+          message.reply('please provide a valid update for this setting.');
+        }
+      } else {
+        message.reply('please provide a valid update for this setting.');
+      }
+      break;
+    default:
+      break;
+  }
+};
+
 // TODO: Error handling, pls
 const updateGuildSettingsAdmin = function(bot, message, input) {
   if (config.admins.indexOf(message.author.id) !== -1) {
@@ -501,6 +544,13 @@ const info = {
         role: 'Specify a role to be excluded from logging.',
         c: null,
         r: null
+      }
+    },
+    tt: {
+      handler: guildUpdateTt,
+      usage: {
+        'djlimit [limit]': 'Sets the number of DJs that can be on the decks (playing music) at one time (default `3`).',
+        'songlimit [limit]': 'Sets the number of songs a DJ can play before they are removed from the decks (default `none` - no limit).'
       }
     }
   }

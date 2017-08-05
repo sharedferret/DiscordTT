@@ -36,7 +36,7 @@ The bot reads config values from the `config.json` file in the project's root di
 ```JSON
 {
   "discord": {
-    "credentials: {
+    "credentials": {
       "token": "YourBotToken"
     }
   },

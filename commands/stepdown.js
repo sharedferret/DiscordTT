@@ -1,7 +1,7 @@
 const tt = require(global.paths.lib + 'turntable-handler');
 
 const handleMessage = function(bot, message, input) {
-  tt.removeDj(bot, message);
+  tt.removeDjRequest(bot, message);
 };
 
 const info = {

@@ -8,21 +8,28 @@ const gmapsClient = require('@google/maps').createClient({ key: config.api.googl
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const RateLimiter = require(global.paths.lib + 'rate-limiter');
+const cacheManager = require(global.paths.lib + 'cache-manager');
 
 const handleMessage = function(bot, message, input) {
   if (requestIsEligible(message)) {
     if (input.input) {
       const searchParameters = input.input;
 
-      if (global.locationCache[searchParameters]) {
-        retrieveForecast(bot, message, input, global.locationCache[searchParameters]);
-      } else {
-        gmapsClient.geocode({
-          address: searchParameters
-        }, function(err, response) {
+      cacheManager.makeCachedApiCall(
+        `Geocode:${searchParameters}`,
+        1209600, // 14 days
+        (callback) => {
+          gmapsClient.geocode({
+            address: searchParameters
+          }, callback);
+        },
+        (callback, err, response) => {
+          callback.apply(this, [err, response]);
+        },
+        (err, response) => {
           if (err) {
             message.reply('I couldn\'t find that city.');
-            console.warn('Geocode error', err);
+            console.log('Geocode error', err);
           }
 
           const metadata = {};
@@ -47,12 +54,9 @@ const handleMessage = function(bot, message, input) {
           metadata.location.formatted_address = result.formatted_address;
           metadata.location.timezone = tzlookup(result.geometry.location.lat, result.geometry.location.lng);
 
-          // Add to cache
-          global.locationCache[searchParameters] = metadata;
-
           retrieveForecast(bot, message, input, metadata);
-        });
-      }
+        }
+      );
     } else {
       userHandler.getProfile(message.author, null, function(profile) {
         if (profile) {
@@ -84,12 +88,27 @@ const retrieveForecast = function(bot, message, input, metadata) {
     if (input.flags.units == 'si') units = 'si';
   }
 
-  forecast
-    .latitude(metadata.location.coordinates.latitude)
-    .longitude(metadata.location.coordinates.longitude)
-    .units(units)
-    .get()
-    .then(res => {
+  cacheManager.makeCachedApiCall(
+    `DarkSky:${metadata.location.coordinates.latitude},${metadata.location.coordinates.longitude},${units}`,
+    900,
+    (callback) => {
+      forecast
+      .latitude(metadata.location.coordinates.latitude)
+      .longitude(metadata.location.coordinates.longitude)
+      .units(units)
+      .get()
+      .then(callback.bind(this, null))
+      .catch(callback)
+    },
+    (callback, err, res) => {
+      callback.apply(this, [err, res]);
+    },
+    (err, res) => {
+      if (err) {
+        console.warn('Error while retrieving Dark Sky response', err);
+        return message.reply('I couldn\'t get a forecast at this time.');
+      }
+
       units = res.flags.units;
 
       const embed = Utils.createEmbed(message, 'Dark Sky');
@@ -170,12 +189,9 @@ const retrieveForecast = function(bot, message, input, metadata) {
 
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + res.latitude + ',' + res.longitude + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
 
-      message.channel.send('', { embed: embed });      
-
-    })
-    .catch(err => {
-      console.warn('Error while retrieving Dark Sky response', err);
-    })
+      message.channel.send('', { embed: embed });
+    }
+  );
 };
 
 const requestIsEligible = function(message) {
@@ -186,14 +202,6 @@ const requestIsEligible = function(message) {
   const serverSettings = serverSettingsManager.getSettings(message.guild.id);
   return serverSettings.weather && serverSettings.weather.enabled && serverSettings.weather.source === 'DarkSky';
 };
-
-const limiter = RateLimiter({
-  namespace: 'UserRateLimit:forecast:',
-  interval: 180000,
-  maxInInterval: 5,
-  minDifference: 3000,
-  storeBlocked: false
-});
 
 const info = {
   name: ['forecast'],
@@ -212,8 +220,7 @@ const info = {
         days: 'How many days should be displayed (1-7)'
       }
     }
-  },
-  rateLimiter: limiter
+  }
 };
 
 module.exports = {

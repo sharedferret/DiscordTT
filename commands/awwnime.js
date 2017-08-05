@@ -2,6 +2,7 @@ const { URL, URLSearchParams } = require('url');
 const request = require('request');
 const RateLimiter = require(global.paths.lib + 'rate-limiter');
 const redis = require(global.paths.lib + 'redis-client');
+const cacheManager = require(global.paths.lib + 'cache-manager');
 
 const handleMessage = function(bot, message, input) {
   if (input.flags && input.flags.l === '') {
@@ -58,26 +59,35 @@ const handleMessage = function(bot, message, input) {
 
   url.searchParams.append('sources', sources.join(','));
   url.searchParams.append('limit', '20');
-  console.log(url.href);
 
-  request(url.href, function(err, response, body) {
-    if (err) {
-      console.warn(err);
-      return message.reply('there was an error processing your request.');
+  cacheManager.makeCachedApiCall(
+    `Redditbooru:${url}`,
+    21600, // 6 hours
+    (callback) => {
+      request(url.href, callback);
+    },
+    (callback, err, response, body) => {
+      callback.apply(this, [err, body]);
+    },
+    (err, body) => {
+      if (err) {
+        console.warn(err);
+        return message.reply('there was an error processing your request.');
+      }
+      try {
+        const jsonBody = JSON.parse(body);
+        const entries = jsonBody.filter(function(i) { return i.nsfw == false; });
+        const entry = _.sample(entries);
+
+        let msg = decodeURIComponent(entry.cdnUrl) + '\n**' + decodeURIComponent(entry.title) + '**';
+        if (entry.caption) msg += '\n_' + decodeURIComponent(entry.caption) + '_';
+
+        message.reply(msg);
+      } catch (e) {
+        return message.reply('I couldn\'t find any images that matched your request.');
+      }
     }
-    try {
-      const jsonBody = JSON.parse(body);
-      const entries = jsonBody.filter(function(i) { return i.nsfw == false; });
-      const entry = _.sample(entries);
-
-      let msg = decodeURIComponent(entry.cdnUrl) + '\n**' + decodeURIComponent(entry.title) + '**';
-      if (entry.caption) msg += '\n_' + decodeURIComponent(entry.caption) + '_';
-
-      message.reply(msg);
-    } catch (e) {
-      return message.reply('I couldn\'t find any images that matched your request.');
-    }
-  });
+  );
 };
 
 const listSubreddits = function(message) {

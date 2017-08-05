@@ -6,6 +6,7 @@ const youtube = google.youtube('v3');
 const uuid = require('uuid/v4');
 const url = require('url');
 const RateLimiter = require(global.paths.lib + 'rate-limiter');
+const cacheManager = require(global.paths.lib + 'cache-manager');
 
 const handleMessage = function(bot, message, input) {
   const searchParameters = input.input;
@@ -22,64 +23,72 @@ const handleMessage = function(bot, message, input) {
     return addYoutubeVideo(bot, message, videoId);
   }
 
-  youtube.search.list({
-    key: config.api.google,
-    part: 'snippet',
-    type: 'video',
-    maxResults: 3,
-    q: searchParameters
-  }, function(error, response) {
-    if (error) {
-      console.warn('An error occurred while searching YouTube', error);
-      return message.reply('I couldn\'t fetch Youtube videos for your request. Please try again later.');
-    }
-
-    if (response.items[0]) {
-      const embed = Utils.createEmbed(message);
-
-      embed.setAuthor(bot.user.username, bot.user.avatarURL);
-
-      embed.setTitle('Select a song to add');
-
-      let description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';
-
-      for (var i in response.items) {
-        description += (parseInt(i) + 1) + ') [' + response.items[i].snippet.title +'](https://www.youtube.com/watch?v=' + response.items[i].id.videoId + ')\n';
+  cacheManager.makeCachedApiCall(
+    `Youtube:Search:${searchParameters}`,
+    259200, // 3 days
+    (callback) => {
+      youtube.search.list({
+        key: config.api.google,
+        part: 'snippet',
+        type: 'video',
+        maxResults: 3,
+        q: searchParameters
+      }, callback);
+    },
+    (callback, err, response) => {
+      callback.apply(this, [err, response]);
+    },
+    (error, response) => {
+      if (error) {
+        console.warn('An error occurred while searching YouTube', error);
+        return message.reply('I couldn\'t fetch Youtube videos for your request. Please try again later.');
       }
 
-      embed.setDescription(description);
+      if (response.items[0]) {
+        const embed = Utils.createEmbed(message);
 
-      console.log('adding request');
+        embed.setAuthor(bot.user.username, bot.user.avatarURL);
 
-      const id = uuid();
+        embed.setTitle('Select a song to add');
 
-      messageHandler.addRequest({
-        type: 'queue',
-        message: message,
-        data: response.items,
-        created: new Date(),
-        handler: handleActiveRequest,
-        id: id
-      });
+        let description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';
 
-      const requestHandler = function(id) {
-        console.log('Removing request ' + id);
-        messageHandler.removeRequest(id);
-      };
+        for (var i in response.items) {
+          description += (parseInt(i) + 1) + ') [' + response.items[i].snippet.title +'](https://www.youtube.com/watch?v=' + response.items[i].id.videoId + ')\n';
+        }
 
-      // Remove this handler after 10 seconds, if it hasn't already been handled
-      setTimeout(requestHandler.bind(this, id), 10000);
+        embed.setDescription(description);
 
-      message.channel.send('', { embed: embed });
-    } else {
-      return message.reply('I was unable to find matching songs for your request.');
+        console.log('adding request');
+
+        const id = uuid();
+
+        messageHandler.addRequest({
+          type: 'queue',
+          message: message,
+          data: response.items,
+          created: new Date(),
+          handler: handleActiveRequest,
+          id: id
+        });
+
+        const requestHandler = function(id) {
+          console.log('Removing request ' + id);
+          messageHandler.removeRequest(id);
+        };
+
+        // Remove this handler after 10 seconds, if it hasn't already been handled
+        setTimeout(requestHandler.bind(this, id), 10000);
+
+        message.channel.send('', { embed: embed });
+      } else {
+        return message.reply('I was unable to find matching songs for your request.');
+      }
     }
-  });
+  );
 };
 
 const handleActiveRequest = function(bot, message, request) {
-  console.log('handling request from queue');
-
   const content = message.content.trim();
 
   if (message.content >= 1 && message.content <= 3) {
@@ -95,21 +104,31 @@ const handleActiveRequest = function(bot, message, request) {
 };
 
 const addYoutubeVideo = function(bot, message, videoId) {
-  youtube.videos.list({
-    key: config.api.google,
-    part: 'snippet,contentDetails',
-    type: 'video',
-    id: videoId
-  }, function(error, response) {
-    if (error) {
-      console.warn('An error occurred while searching YouTube', error);
-      return message.reply('I couldn\'t fetch the Youtube video for your request. Please try again later.');
-    }
+  cacheManager.makeCachedApiCall(
+    `Youtube:Video:${videoId}`,
+    1209600, // 14 days
+    (callback) => {
+      youtube.videos.list({
+        key: config.api.google,
+        part: 'snippet,contentDetails',
+        type: 'video',
+        id: videoId
+      }, callback);
+    },
+    (callback, err, response) => {
+      callback.apply(this, [err, response]);
+    },
+    (error, response) => {
+      if (error) {
+        console.warn('An error occurred while searching YouTube', error);
+        return message.reply('I couldn\'t fetch the Youtube video for your request. Please try again later.');
+      }
 
-    if (response.items[0]) {
-      queueHandler.queueSong(bot, message, response.items[0]);
+      if (response.items[0]) {
+        queueHandler.queueSong(bot, message, response.items[0]);
+      }
     }
-  });
+  );
 };
 
 const limiter = RateLimiter({

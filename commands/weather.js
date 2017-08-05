@@ -9,6 +9,7 @@ const gmapsClient = require('@google/maps').createClient({ key: config.api.googl
 const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const RateLimiter = require(global.paths.lib + 'rate-limiter');
+const cacheManager = require(global.paths.lib + 'cache-manager');
 
 const handleMessage = function(bot, message, input) {
   if (input.input) {
@@ -51,16 +52,18 @@ const retrieveWeather = function(bot, message, input, metadata) {
   // TODO: Shared code with forecast.js
   if (source == 'DarkSky') {
     if (!metadata) {
-      if (global.locationCache[searchParameters]) {
-        console.log('Using cached location data');
-        retrieveWeather_DarkSky(bot, message, input, global.locationCache[searchParameters]);
-      } else {
-        console.log('Calling Google for geocode');
-
-        // TODO [#60]: Cache this result
-        gmapsClient.geocode({
-          address: searchParameters
-        }, function(err, response) {
+      cacheManager.makeCachedApiCall(
+        `Geocode:${searchParameters}`,
+        1209600, // 14 days
+        (callback) => {
+          gmapsClient.geocode({
+            address: searchParameters
+          }, callback);
+        },
+        (callback, err, response) => {
+          callback.apply(this, [err, response]);
+        },
+        (err, response) => {
           if (err) {
             message.reply('I couldn\'t find that city.');
             console.warn('Geocode error', err);
@@ -89,12 +92,9 @@ const retrieveWeather = function(bot, message, input, metadata) {
           metadata.location.formatted_address = result.formatted_address;
           metadata.location.timezone = tzlookup(result.geometry.location.lat, result.geometry.location.lng);
 
-          // Add to cache
-          global.locationCache[searchParameters] = metadata;
-
           retrieveWeather_DarkSky(bot, message, input, metadata);
-        });
-      }
+        }
+      );
     } else {
       retrieveWeather_DarkSky(bot, message, input, metadata);
     }
@@ -116,37 +116,49 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
     apiUrl = 'http://api.openweathermap.org/data/2.5/weather?appid=' + config.api.openweathermap + '&q=' + searchParameters;
   }
 
-  request(apiUrl,
-    function (error, response, body) {
+  cacheManager.makeCachedApiCall(
+    `OpenWeatherMap:${apiUrl}`,
+    900,
+    (callback) => {
+      request(apiUrl, callback);
+    },
+    (callback, err, response, body) => {
+      callback.apply(this, [err, body]);
+    },
+    (error, body) => {
       if (error) return console.log(error);
-      if (!response.statusCode == 200) return console.log('Non-200 response received', response);
 
-      const weather = JSON.parse(body);
+      try {
+        const weather = JSON.parse(body);
 
-      if (weather.cod != 200) {
-        return message.reply('I couldn\'t find that city.');
+        if (weather.cod != 200) {
+          return message.reply('I couldn\'t find that city.');
+        }
+
+        const embed = Utils.createEmbed(message, 'OpenWeatherMap');
+
+        const country = countryData.countries[weather.sys.country];
+
+        embed.setTitle(country.emoji + ' Weather for ' + weather.name + ', ' + country.name + ' (' + Utils.formatLatitude(weather.coord.lat) + ', ' + Utils.formatLongitude(weather.coord.lon) + ')');
+        embed.addField('Conditions', Utils.weatherIconEmoji[weather.weather[0].icon] + ' ' + weather.weather[0].main, true);
+        embed.addField('Temperature', Utils.kelvinToFahrenheit(weather.main.temp).toFixed() + '°F (' + Utils.kelvinToCelsius(weather.main.temp).toFixed() + '°C)', true);
+        embed.addField('Humidity', weather.main.humidity + '%', true);
+        if (weather.visibility) {
+          embed.addField('Visibility', Utils.metersToMiles(weather.visibility).toFixed(1) + ' miles (' + (weather.visibility / 1000).toFixed() + 'km)', true);
+        } else {
+          embed.addField('Visibility', 'Unknown', true);
+        }
+        embed.addField('Wind', Utils.emojiForDirection(weather.wind.deg) + ' ' + Utils.mpsToMph(weather.wind.speed).toFixed() + ' mph (' + Utils.mpsToKph(weather.wind.speed).toFixed() + ' kph)', true);
+        embed.addField('Pressure', Utils.hpaToInhg(weather.main.pressure).toFixed(2) + ' inches', true);
+
+        embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + weather.coord.lat + ',' + weather.coord.lon + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
+
+        message.channel.send('', { embed: embed });
+      } catch (e) {
+        return message.reply('I couldn\'t get a forecast at this time.');
       }
-
-      const embed = Utils.createEmbed(message, 'OpenWeatherMap');
-
-      const country = countryData.countries[weather.sys.country];
-
-      embed.setTitle(country.emoji + ' Weather for ' + weather.name + ', ' + country.name + ' (' + Utils.formatLatitude(weather.coord.lat) + ', ' + Utils.formatLongitude(weather.coord.lon) + ')');
-      embed.addField('Conditions', Utils.weatherIconEmoji[weather.weather[0].icon] + ' ' + weather.weather[0].main, true);
-      embed.addField('Temperature', Utils.kelvinToFahrenheit(weather.main.temp).toFixed() + '°F (' + Utils.kelvinToCelsius(weather.main.temp).toFixed() + '°C)', true);
-      embed.addField('Humidity', weather.main.humidity + '%', true);
-      if (weather.visibility) {
-        embed.addField('Visibility', Utils.metersToMiles(weather.visibility).toFixed(1) + ' miles (' + (weather.visibility / 1000).toFixed() + 'km)', true);
-      } else {
-        embed.addField('Visibility', 'Unknown', true);
-      }
-      embed.addField('Wind', Utils.emojiForDirection(weather.wind.deg) + ' ' + Utils.mpsToMph(weather.wind.speed).toFixed() + ' mph (' + Utils.mpsToKph(weather.wind.speed).toFixed() + ' kph)', true);
-      embed.addField('Pressure', Utils.hpaToInhg(weather.main.pressure).toFixed(2) + ' inches', true);
-
-      embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + weather.coord.lat + ',' + weather.coord.lon + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
-
-      message.channel.send('', { embed: embed });
-    });
+    }
+  );
 };
 
 const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
@@ -160,12 +172,27 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
     if (input.flags.units == 'si') units = 'si';
   }
 
-  forecast
-    .latitude(metadata.location.coordinates.latitude)
-    .longitude(metadata.location.coordinates.longitude)
-    .units(units)
-    .get()
-    .then(res => {
+  cacheManager.makeCachedApiCall(
+    `DarkSky:${metadata.location.coordinates.latitude},${metadata.location.coordinates.longitude},${units}`,
+    900,
+    (callback) => {
+      forecast
+      .latitude(metadata.location.coordinates.latitude)
+      .longitude(metadata.location.coordinates.longitude)
+      .units(units)
+      .get()
+      .then(callback.bind(this, null))
+      .catch(callback)
+    },
+    (callback, err, res) => {
+      callback.apply(this, [err, res]);
+    },
+    (err, res) => {
+      if (err) {
+        console.warn('Error while retrieving Dark Sky response', err);
+        return message.reply('I couldn\'t get a forecast at this time.');
+      }
+
       units = res.flags.units;
 
       const embed = Utils.createEmbed(message, 'Dark Sky');
@@ -261,10 +288,8 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + res.latitude + ',' + res.longitude + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);
 
       message.channel.send('', { embed: embed });
-    })
-    .catch(err => {
-      console.warn('Error while retrieving DarkSky response', err);
-    });
+    }
+  );
 };
 
 const limiter = RateLimiter({

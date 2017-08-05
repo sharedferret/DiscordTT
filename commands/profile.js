@@ -2,10 +2,11 @@ const tt = require(global.paths.lib + 'turntable-handler');
 const db = require(global.paths.lib + 'database-client').db;
 const userHandler = require(global.paths.lib + 'user-handler');
 const countryData = require('country-data');
-const request = require('request');
+const gmapsClient = require('@google/maps').createClient({ key: config.api.google });
 const tzlookup = require('tz-lookup');
 const moment = require('moment');
 require('moment-timezone');
+const cacheManager = require(global.paths.lib + 'cache-manager');
 
 
 const displayProfile = function(bot, message, input) {
@@ -118,19 +119,26 @@ const profileSetCountry = function(bot, message, input) {
 const profileSetLocation = function(bot, message, input) {
   const inputLocation = input.input;
 
-  const apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(inputLocation) + '&key=' + config.api.google;
+  cacheManager.makeCachedApiCall(
+    `Geocode:${inputLocation}`,
+    1209600, // 14 days
+    (callback) => {
+      gmapsClient.geocode({
+        address: inputLocation
+      }, callback);
+    },
+    (callback, err, response) => {
+      callback.apply(this, [err, response]);
+    },
+    (err, response) => {
+      if (err) {
+        message.reply('I couldn\'t find that city.');
+        console.log('Geocode error', err);
+      }
 
-  request(apiUrl, function(error, response, body) {
-    if (error) return console.log(error);
-    if (!response.statusCode == 200) return console.log('Non-200 response received', response);
-
-    const data = JSON.parse(body);
-
-    if (data.results.length > 0) {
-      const result = data.results[0];
+      const result = response.json.results[0];
 
       const metadata = {};
-
       const metadataComponents = {};
 
       for (const component of result.address_components) {
@@ -151,7 +159,7 @@ const profileSetLocation = function(bot, message, input) {
       userHandler.updateProfileData(message.author.id, metadata);
       message.reply('I\'ve added the location `' + result.formatted_address + '` to your profile.');
     }
-  });
+  );
 };
 
 const profileSetBattletag = function(bot, message, input) {

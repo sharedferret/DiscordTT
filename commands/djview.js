@@ -1,4 +1,4 @@
-const tt = require(global.paths.lib + 'turntable-handler-legacy');
+const tt = require(global.paths.lib + 'turntable-handler');
 const db = require(global.paths.lib + 'database-client').db;
 
 const handleMessage = function(bot, message, input) {
@@ -9,31 +9,34 @@ const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
 
   embed.setAuthor('Current DJs', bot.user.avatarURL);
-
-  tt.getVotesForSong(bot, message.guild.id);
   const state = tt.getState(message.guild.id);
 
   if (state) {
-    db.serialize(function() {
-      //TODO: Fix
-      db.all('SELECT id, points FROM User WHERE id IN (' + state.djs.map(function(i) { return i.id; }).join(',') + ')', [],
-        function(err, result) {
-          if (err) console.log(err);
+    tt.getVotesForSong(bot, message.guild.id)
+      .then(votes => {
+        db.all('SELECT id, points FROM User WHERE id IN (' + state.djs.map(function(i) { return i.id; }).join(',') + ')', [],
+          function(err, result) {
+            if (err) console.log(err);
 
-          for (var i in state.djs) {
-            const djName = (state.currentDj == i ? ':cd: ' : '') + state.djs[i].username;
-            embed.addField(djName, _.find(result, function(j) { console.log('checking if ' + j.id + ' is equal to ' + state.djs[i].id); return j.id == state.djs[i].id; }).points + ' points', true);
-          }
+            let description = '';
 
-          if (state.nowPlaying) {
-            embed.addField('Now Playing', state.nowPlaying.title + '\n' + state.upvotes + ':thumbsup:  '+ state.downvotes + ':thumbsdown:');
-          }
-  
-          embed.addField('Waiting DJs', '_None_');
+            for (var i in state.djs) {
+              const djName = (state.currentDj == i ? ':cd:\t' : '\t') + state.djs[i].username;
+              const djPoints = _.find(result, j => { return j.id == state.djs[i].id; }).points;
+              description += `**${djName}** (${djPoints} points)\n`;
+            }
 
-          message.channel.send('', { embed: embed });
-        });
-    });
+            embed.setDescription(description);
+
+            if (state.nowPlaying) {
+              embed.addField('Now Playing', state.nowPlaying.title + '\n' + votes.up + ':thumbsup:  '+ votes.down + ':thumbsdown:');
+            }
+    
+            embed.addField('Waiting DJs', '_None_');
+
+            message.channel.send('', { embed: embed });
+          });
+      });
   } else {
     message.reply('there are no users DJing at the moment.');
   }

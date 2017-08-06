@@ -1,4 +1,4 @@
-const tt = require(global.paths.lib + 'turntable-handler-legacy');
+const tt = require(global.paths.lib + 'turntable-handler');
 
 const handleMessage = function(bot, message, input) {
   tt.removeDjRequest(bot, message);

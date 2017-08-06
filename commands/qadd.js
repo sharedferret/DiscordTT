@@ -1,6 +1,5 @@
 const messageHandler = require(global.paths.lib + 'message-handler');
 const queueHandler = require(global.paths.lib + 'queue-handler');
-const tt = require(global.paths.lib + 'turntable-handler-legacy');
 const google = require('googleapis');
 const youtube = google.youtube('v3');
 const uuid = require('uuid/v4');

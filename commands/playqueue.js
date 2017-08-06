@@ -1,5 +1,5 @@
 const playlistHandler = require(global.paths.lib + 'playlist-handler');
-const tt = require(global.paths.lib + 'turntable-handler-legacy');
+const tt = require(global.paths.lib + 'turntable-handler');
 const url = require('url');
 
 const viewPlayQueue = (bot, message, input) => {

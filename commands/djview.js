@@ -1,4 +1,4 @@
-const tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler-legacy');
 const db = require(global.paths.lib + 'database-client').db;
 
 const handleMessage = function(bot, message, input) {

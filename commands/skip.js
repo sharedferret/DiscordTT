@@ -1,4 +1,4 @@
-const tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler-legacy');
 
 const handleMessage = function(bot, message, input) {
   if (!message.guild) {

@@ -1,5 +1,5 @@
 const queueHandler = require(global.paths.lib + 'queue-handler');
-const tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler-legacy');
 
 const qAdd = require(global.paths.commands + 'qadd');
 const qRm = require(global.paths.commands + 'qrm');

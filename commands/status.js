@@ -2,7 +2,7 @@ const git = require('git-rev');
 const pkg = require(global.paths.root + '/package.json');
 const moment = require('moment');
 const humanize = require('humanize');
-const tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler-legacy');
 require('moment-precise-range-plugin');
 
 const handleMessage = function(bot, message, input) {

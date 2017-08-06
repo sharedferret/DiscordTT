@@ -11,7 +11,7 @@ const redisClient = require(global.paths.lib + 'redis-client');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const userHandler = require(global.paths.lib + 'user-handler');
 const guildLogger = require(global.paths.lib + 'guild-logging-handler');
-require(global.paths.lib + 'turntable-handler');
+require(global.paths.lib + 'turntable-handler-legacy');
 
 bot.on('message', message => {
   messageHandler.handleMessage(bot, message);

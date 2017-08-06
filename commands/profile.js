@@ -1,4 +1,4 @@
-const tt = require(global.paths.lib + 'turntable-handler');
+const tt = require(global.paths.lib + 'turntable-handler-legacy');
 const db = require(global.paths.lib + 'database-client').db;
 const userHandler = require(global.paths.lib + 'user-handler');
 const countryData = require('country-data');

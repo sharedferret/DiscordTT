@@ -135,6 +135,10 @@ const profileSetLocation = function(bot, message, input) {
         console.log('Geocode error', err);
       }
 
+      if (response.json.status == 'ZERO_RESULTS') {
+        return message.reply('I couldn\'t find that city.');
+      }
+
       const result = response.json.results[0];
 
       const metadata = {};

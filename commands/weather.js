@@ -75,6 +75,10 @@ const retrieveWeather = function(bot, message, input, metadata) {
 
           const metadataComponents = {};
 
+          if (response.json.status == 'ZERO_RESULTS') {
+            return message.reply('I couldn\'t find that city.');
+          }
+
           const result = response.json.results[0];
 
           for (const component of result.address_components) {

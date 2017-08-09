@@ -32,6 +32,10 @@ const handleMessage = function(bot, message, input) {
             console.log('Geocode error', err);
           }
 
+          if (response.json.status == 'ZERO_RESULTS') {
+            return message.reply('I couldn\'t find that city.');
+          }
+
           const metadata = {};
           metadata.location = {};
           metadata.location.coordinates = {};

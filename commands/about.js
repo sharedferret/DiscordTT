@@ -1,4 +1,5 @@
 const pkg = require(global.paths.root + '/package.json');
+const moment = require('moment');
 
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);

@@ -6,6 +6,8 @@ const youtube = google.youtube('v3');
 const uuid = require('uuid/v4');
 const url = require('url');
 const cacheManager = require(global.paths.lib + 'cache-manager');
+const moment = require('moment');
+require('moment-precise-range-plugin');
 
 const handleMessage = function(bot, message, input) {
   const searchParameters = input.input;
@@ -22,8 +24,6 @@ const handleMessage = function(bot, message, input) {
     return addYoutubeVideo(bot, message, videoId);
   }
 
-  // TODO [#60]: Cache this response if possible, since it uses 100 units per search request
-  // TODO [#59]: Grab contentDetails since it's only an extra 3 units
   cacheManager.makeCachedApiCall(
     `Youtube:Search:${searchParameters}`,
     259200, // 3 days
@@ -46,42 +46,66 @@ const handleMessage = function(bot, message, input) {
       }
 
       if (response.items[0]) {
-        const embed = Utils.createEmbed(message);
+        const videoIds = response.items.map(i => { return i.id.videoId; });
 
-        embed.setAuthor(bot.user.username, bot.user.avatarURL);
+        cacheManager.makeCachedApiCall(
+          `Youtube:Video:${videoIds.join(',')}`,
+          259200, // 3 days
+          (callback) => {
+            youtube.videos.list({
+              key: config.api.google,
+              part: 'snippet,contentDetails',
+              type: 'video',
+              id: videoIds.join(',')
+            }, callback);
+          },
+          (callback, err, response) => {
+            callback.apply(this, [err, response]);
+          },
+          (error, response) => {
+            const embed = Utils.createEmbed(message);
+            embed.setAuthor(bot.user.username, bot.user.avatarURL);
+            embed.setTitle('Select a song to play');
 
-        embed.setTitle('Select a song to play');
+            let description = '_Respond within 10 seconds with the number of the song to play._\n\n';
 
-        let description = '_Respond within 10 seconds with the number of the song to play._\n\n';
+            for (var i in response.items) {
+              const length = Utils.convertYoutubeDuration(response.items[i].contentDetails.duration);
+              const restrictedCountries = response.items[i].contentDetails.regionRestriction;
 
-        for (var i in response.items) {
-          description += (parseInt(i) + 1) + ') [' + response.items[i].snippet.title +'](https://www.youtube.com/watch?v=' + response.items[i].id.videoId + ')\n';
-        }
+              // Only add track if it's available to be played in the country the bot is running in
+              if (!(config.turntable.serverCountry && restrictedCountries && 
+                restrictedCountries.blocked.indexOf(config.turntable.serverCountry) !== -1)) {
 
-        embed.setDescription(description);
+                description += `${parseInt(i) + 1}) [${response.items[i].snippet.title}](https://www.youtube.com/watch?v=${response.items[i].id}) (${length.format('hh[:]mm[:]ss')})\n`;
+              } else {
+                console.log('cannot play ' + response.items[i].id);
+              }
+            }
 
-        console.log('adding request');
+            embed.setDescription(description);
 
-        const id = uuid();
+            const id = uuid();
+            messageHandler.addRequest({
+              type: 'play',
+              message: message,
+              data: response.items,
+              created: new Date(),
+              handler: handleActiveRequest,
+              id: id
+            });
 
-        messageHandler.addRequest({
-          type: 'play',
-          message: message,
-          data: response.items,
-          created: new Date(),
-          handler: handleActiveRequest,
-          id: id
-        });
+            const requestHandler = function(id) {
+              console.log('Removing request ' + id);
+              messageHandler.removeRequest(id);
+            };
 
-        const requestHandler = function(id) {
-          console.log('Removing request ' + id);
-          messageHandler.removeRequest(id);
-        };
+            // Remove this handler after 10 seconds, if it hasn't already been handled
+            setTimeout(requestHandler.bind(this, id), 10000);
 
-        // Remove this handler after 10 seconds, if it hasn't already been handled
-        setTimeout(requestHandler.bind(this, id), 10000);
-
-        message.channel.send('', { embed: embed });
+            message.channel.send('', { embed: embed });
+          }
+        )
       } else {
         return message.reply('I was unable to find matching songs for your request.');
       }

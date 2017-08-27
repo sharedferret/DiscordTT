@@ -262,49 +262,7 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
       }
       
       if (res.alerts) {
-        const alertEntryParts = [[]];
-        const alertEntryLengths = [0];
-        let idx = 0;
-
-        for (const alert of res.alerts) {
-          let alertText = '';
-
-          switch (alert.severity) {
-            case 'advisory':
-              alertText += ':large_blue_diamond: ';
-              break;
-            case 'watch':
-              alertText += ':o: ';
-              break;
-            case 'warning':
-              alertText += ':red_circle: ';
-              break;
-            default:
-          }
-
-          alertText += alert.title;
-
-          if (alert.expires) {
-            alertText += ' (Until ' + moment(alert.expires * 1000).tz(res.timezone).format(Utils.unitSymbols[units].dateShort + ', ' + Utils.unitSymbols[units].time) + ')';
-          }
-
-          if (alertEntryLengths[idx] + alertText.length > 1000) {
-            idx++;
-            alertEntryLengths[idx] = 0;
-            alertEntryParts[idx] = [];
-          }
-
-          alertEntryParts[idx].push(alertText);
-          alertEntryLengths[idx] += alertText.length;
-        }
-
-        for (const index in alertEntryParts) {
-          if (index == 0) {
-            embed.addField('Alerts', alertEntryParts[index].join('\n'));
-          } else {
-            embed.addField('\u200B', alertEntryParts[index].join('\n'));
-          }
-        }
+        Utils.addDarkSkyAlerts(res, units, embed);
       }
 
       embed.setThumbnail('https://maps.googleapis.com/maps/api/staticmap?center=' + res.latitude + ',' + res.longitude + '&zoom=7&size=110x110&maptype=roadmap&key=' + config.api.google);

@@ -1,6 +1,6 @@
 {
 	"name": "discord-tt",
-	"version": "0.8.3",
+	"version": "0.8.4",
 	"description": "Moderation and music bot for discord servers",
 	"main": "./app.js",
 	"repository": {

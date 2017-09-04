@@ -12,7 +12,7 @@ require('moment-precise-range-plugin');
 const handleMessage = function(bot, message, input) {
   const searchParameters = input.input;
 
-  if (searchParameters == '') {
+  if (!searchParameters) {
     return message.reply('no results found.');
   }
 

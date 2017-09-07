@@ -10,7 +10,7 @@ const handleMessage = function(bot, message, input) {
   const queryParams = [];
 
   // If the global flag is not present, limit search to the current guild
-  if (!(input.flags && input.flags.global)) {
+  if (!(input.flags && input.flags.global !== undefined)) {
     whereParameters.push('h.serverId = ?');
     queryParams.push(message.guild.id);
   }

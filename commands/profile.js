@@ -12,6 +12,7 @@ const displayProfile = function(bot, message, input) {
   if (message.mentions.users.size > 0) {
     displayProfileForUser(bot, message, message.mentions.users.first());
   } else if (input.input) {
+    // TODO: Accept uid, tags
     displayProfileForUser(bot, message, message.author);
   } else {
     displayProfileForUser(bot, message, message.author);

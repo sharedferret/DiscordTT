@@ -1,6 +1,6 @@
 {
 	"name": "discord-tt",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"description": "Moderation and music bot for discord servers",
 	"main": "./app.js",
 	"repository": {
@@ -37,6 +37,7 @@
 		"sqlite3": "^3.1.8",
 		"tz-lookup": "^6.1.1",
 		"uuid": "^3.1.0",
+		"winston": "^2.3.1",
 		"xml2js": "^0.4.17",
 		"ytdl-core": "^0.15.0"
 	},

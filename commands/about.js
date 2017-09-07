@@ -16,7 +16,7 @@ const handleMessage = function(bot, message, input) {
     embed.addField('Version', pkg.version, true);
   }
   
-  embed.addField('Creator', 'Yui#1441', true);
+  embed.addField('Creator', '<@140287106068119553>', true);
   embed.addField('Invite Link', 'http://invite.tohru.club/', true);
   embed.addField('Dev/Support Server', 'http://discord.tohru.club/', true);
   embed.addField('Servers', bot.guilds.size, true);

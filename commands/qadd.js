@@ -76,7 +76,7 @@ const handleMessage = function(bot, message, input) {
               const restrictedCountries = response.items[i].contentDetails.regionRestriction;
 
               // Only add track if it's available to be played in the country the bot is running in
-              if (!(config.turntable.serverCountry && restrictedCountries && 
+              if (!(config.turntable.serverCountry && restrictedCountries && restrictedCountries.blocked &&
                 restrictedCountries.blocked.indexOf(config.turntable.serverCountry) !== -1)) {
 
                 description += `${parseInt(i) + 1}) [${response.items[i].snippet.title}](https://www.youtube.com/watch?v=${response.items[i].id}) (${length.format('hh[:]mm[:]ss')})\n`;

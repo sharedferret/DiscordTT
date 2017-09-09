@@ -7,8 +7,8 @@ require('moment-precise-range-plugin');
 
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
-  embed.setAuthor(bot.user.username, bot.user.avatarURL);
-  embed.setThumbnail(bot.user.avatarURL);
+  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+  embed.setThumbnail(bot.user.avatarURL(256));
 
   let description = '';
 
@@ -24,8 +24,8 @@ const handleMessage = function(bot, message, input) {
   let session = '';
 
   // Active streams
-  session += 'Songs played: ' + tt.networkUsage.streams + '\n';
-  session += 'Data downloaded: ' + humanize.filesize(tt.networkUsage.dataIn, 1024, 2) + '\n';
+  session += 'Songs played: ' + tt.getNetworkUsage().streams + '\n';
+  session += 'Data downloaded: ' + humanize.filesize(tt.getNetworkUsage().dataIn, 1024, 2) + '\n';
 
   embed.addField('This Session', session);
 

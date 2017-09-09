@@ -23,7 +23,7 @@ const viewPlayQueue = (bot, message, input) => {
 
     const embed = Utils.createEmbed(message);
 
-    embed.setAuthor('Play Queue', bot.user.avatarURL);
+    embed.setAuthor('Play Queue', bot.user.avatarURL(256));
 
     let descriptionLines = [];
 

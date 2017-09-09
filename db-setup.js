@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('db.sqlite3');
 
 db.serialize(function() {
-  console.log('- Creating Song');
+  log.info('- Creating Song');
   db.run('CREATE TABLE IF NOT EXISTS Song (' +
     'id TEXT PRIMARY KEY NOT NULL,' +
     'type TEXT NOT NULL,' +
@@ -14,12 +14,12 @@ db.serialize(function() {
     'title TEXT NOT NULL,' +
     'metadata TEXT)');
 
-  console.log('- Creating Server');
+  log.info('- Creating Server');
   db.run('CREATE TABLE IF NOT EXISTS Server (' +
     'id TEXT PRIMARY KEY, ' +
     'settings TEXT)');
 
-  console.log('- Creating User');
+  log.info('- Creating User');
   db.run('CREATE TABLE IF NOT EXISTS User (' +
     'id TEXT PRIMARY KEY NOT NULL,' +
     'serverId TEXT NOT NULL, ' +
@@ -32,7 +32,7 @@ db.serialize(function() {
     'metadata TEXT, ' +
     'activePlaylistId TEXT)');
 
-  console.log('- Creating UserQueue');
+  log.info('- Creating UserQueue');
   db.run('CREATE TABLE IF NOT EXISTS UserQueue (' +
     'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
     'userId TEXT, ' +
@@ -41,7 +41,7 @@ db.serialize(function() {
     'dateAdded DATETIME,' +
     'playlistId TEXT)');
 
-  console.log('- Creating SongHistory');
+  log.info('- Creating SongHistory');
   db.run('CREATE TABLE IF NOT EXISTS SongHistory (' +
     'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
     'serverId TEXT NOT NULL, ' +
@@ -51,7 +51,7 @@ db.serialize(function() {
     'upvotes INTEGER DEFAULT 0, ' +
     'downvotes INTEGER DEFAULT 0)');
 
-  console.log('- Creating Playlist');
+  log.info('- Creating Playlist');
   db.run('CREATE TABLE IF NOT EXISTS Playlist (' +
     'id TEXT PRIMARY KEY, ' +
     'userId TEXT NOT NULL, ' +
@@ -59,7 +59,7 @@ db.serialize(function() {
     'metadata TEXT, ' +
     'UNIQUE(userId, name))');
 
-  console.log('- Creating UserPoints');
+  log.info('- Creating UserPoints');
   db.run('CREATE TABLE IF NOT EXISTS UserPoints(' +
     'userId TEXT PRIMARY KEY, '
     + 'chatMessage INTEGER NOT NULL DEFAULT 0, ' +
@@ -68,7 +68,7 @@ db.serialize(function() {
     'songVote INTEGER NOT NULL DEFAULT 0, ' +
     'songPointEarned INTEGER NOT NULL DEFAULT 0)');
   
-  console.log('- Creating CommandUsage');
+  log.info('- Creating CommandUsage');
   db.run('CREATE TABLE IF NOT EXISTS CommandUsage(' +
     'commandName TEXT NOT NULL, ' +
     'guildId TEXT NOT NULL, ' +

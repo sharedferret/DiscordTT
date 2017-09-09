@@ -15,6 +15,9 @@ const guildLogger = require(global.paths.lib + 'guild-logging-handler');
 require(global.paths.lib + 'turntable-handler');
 
 bot.on('message', message => {
+  // Add a request ID
+  message.requestId = Utils.createRequestId();
+
   messageHandler.handleMessage(bot, message);
 
   // Add a chatMessage point (bots can't earn points)
@@ -33,7 +36,7 @@ bot.on('ready', data => {
   messageHandler.loadCommands();
 
   // Set game to welcome message
-  bot.user.setGame('/help');
+  bot.user.setPresence({ game: { name: '/help', type: 0 }});
 
   // Register any new servers since last startup
   for (const [ guildId, guild ] of bot.guilds) {
@@ -75,7 +78,7 @@ bot.on('guildMemberAdd', member => {
     
     if (joinChannel) {
       joinChannel.send(joinMessage)
-        .catch(e => { console.log(e); })
+        .catch(e => { log.error(e); })
     }
   }
 
@@ -88,7 +91,7 @@ bot.on('guildMemberAdd', member => {
       .catch(err => {
         // TODO [#58]: This will likely be a permission error - the bot needs to remove the role
         // and fire an alert to a logging channel
-        console.log(err);
+        log.info(err);
       });
   }
 
@@ -108,7 +111,7 @@ bot.on('guildMemberRemove', member => {
     try {
       member.guild.channels.get(settings.announcements.announcementChannel).send(leaveMessage);
     } catch (e) {
-      console.log(e);
+      log.warn(e);
     }
   }
 
@@ -142,18 +145,18 @@ bot.on('messageReactionAdd', (messageReaction, user) => {
 });
 
 bot.on('reconnecting', () => {
-  console.log('attempting to reconnect @ ' + new Date());
+  log.info('attempting to reconnect @ ' + new Date());
 });
 
 try {
   bot.login(config.discord.credentials.token);
 } catch (e) {
-  console.log('login failed', e);
+  log.error('login failed', e);
 }
 
 function exitHandler(options, err) {
   if (err) {
-    console.log(err.stack);
+    log.error(err.stack);
   }
 
   // Close database connection

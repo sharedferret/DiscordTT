@@ -41,7 +41,7 @@ const handleMessage = function(bot, message, input) {
     },
     (error, response) => {
       if (error) {
-        console.warn('An error occurred while searching YouTube', error);
+        log.warn('An error occurred while searching YouTube', error);
         return message.reply('I couldn\'t fetch Youtube videos for your request. Please try again later.');
       }
 
@@ -64,7 +64,7 @@ const handleMessage = function(bot, message, input) {
           },
           (error, response) => {
             const embed = Utils.createEmbed(message);
-            embed.setAuthor(bot.user.username, bot.user.avatarURL);
+            embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
             embed.setTitle('Select a song to play');
 
             let description = '_Respond within 10 seconds with the number of the song to play._\n\n';
@@ -79,7 +79,7 @@ const handleMessage = function(bot, message, input) {
 
                 description += `${parseInt(i) + 1}) [${response.items[i].snippet.title}](https://www.youtube.com/watch?v=${response.items[i].id}) (${length.format('hh[:]mm[:]ss')})\n`;
               } else {
-                console.log('cannot play ' + response.items[i].id);
+                log.info('cannot play ' + response.items[i].id);
               }
             }
 
@@ -96,7 +96,7 @@ const handleMessage = function(bot, message, input) {
             });
 
             const requestHandler = function(id) {
-              console.log('Removing request ' + id);
+              log.info('Removing request ' + id);
               messageHandler.removeRequest(id);
             };
 
@@ -145,7 +145,7 @@ const addYoutubeVideo = function(bot, message, videoId) {
     },
     (error, response) => {
       if (error) {
-        console.warn('An error occurred while searching YouTube', error);
+        log.warn('An error occurred while searching YouTube', error);
         return message.reply('I couldn\'t fetch the Youtube video for your request. Please try again later.');
       }
 

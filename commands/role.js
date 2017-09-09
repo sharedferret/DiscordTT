@@ -28,10 +28,10 @@ const listRoles = function(bot, message, input) {
 
   const embed = Utils.createEmbed(message);
 
-  embed.setAuthor('Autoroles', bot.user.avatarURL);
+  embed.setAuthor('Autoroles', bot.user.avatarURL(256));
   embed.setDescription(roleDescription);
   embed.addField('Available Roles', roleList.join('\n'));
-  embed.setThumbnail(message.guild.iconURL);
+  embed.setThumbnail(message.guild.iconURL(256));
 
   message.channel.send('', { embed: embed });
 };
@@ -59,7 +59,7 @@ const grantRole = function(bot, message, input) {
       })
       .catch(err => {
         // TODO [#58]: This will likely be a permission error
-        console.warn(err);
+        log.warn(err);
         return message.reply('I wasn\'t able to add that role, sorry!');
       });
   } else {
@@ -90,7 +90,7 @@ const revokeRole = function(bot, message, input) {
       })
       .catch(err => {
         // TODO [#58]: This will likely be a permission error
-        console.warn(err);
+        log.warn(err);
         return message.reply('I wasn\'t able to remove that role, sorry!');
       });
   } else {

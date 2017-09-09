@@ -12,10 +12,10 @@ const handleMessage = function(bot, message, input) {
 
   const guild = message.guild;
 
-  embed.setAuthor(guild.name, message.guild.iconURL);
+  embed.setAuthor(guild.name, message.guild.iconURL(256));
   embed.setTimestamp(new Date());
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
-  embed.setThumbnail(message.guild.iconURL);
+  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL(256));
+  embed.setThumbnail(message.guild.iconURL(256));
 
   embed.addField('Created By', guild.owner.nickname ? guild.owner.nickname : guild.owner.user.username, true);
   embed.addField('Created', moment(guild.createdTimestamp).format('dddd, MMMM Do YYYY'), true);
@@ -115,7 +115,7 @@ const handleMessage = function(bot, message, input) {
       if (settings && settings.logs && settings.logs.excludechannels && settings.logs.excludechannels[channel.id] !== undefined) {
         return false;
       }
-      return message.guild.me.permissionsIn(channel).has('READ_MESSAGES')
+      return message.guild.me.permissionsIn(channel).has('READ_MESSAGE_HISTORY')
     }).map(i => { return i.name; });
 
     let textChannelsText = textChannels.join(', ');

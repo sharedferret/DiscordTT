@@ -42,7 +42,7 @@ const searchWithKitsu = function(bot, message, input) {
           message.reply('I couldn\'t find that anime.');
         }
       } catch (e) {
-        console.warn('anime lookup failure (Kitsu)', e);
+        log.warn('anime lookup failure (Kitsu)', e);
         message.reply('I couldn\'t find that anime.');
       }
     }
@@ -116,13 +116,13 @@ const searchWithMal = function(bot, message, input) {
         const parsedBody = JSON.parse(body);
 
         if (parsedBody.categories && parsedBody.categories[0] && parsedBody.categories[0].items[0]) {
-          console.log('MAL Prefix Search matched: ' + parsedBody.categories[0].items[0].name);
+          log.info('MAL Prefix Search matched: ' + parsedBody.categories[0].items[0].name);
           respondWithMalOutput(message, parsedBody.categories[0].items[0], searchString);
         } else {
           message.reply('I couldn\'t find that anime.');
         }
       } catch (e) {
-        console.warn('anime lookup failure (MAL)', e);
+        log.warn('anime lookup failure (MAL)', e);
         message.reply('I couldn\'t find that anime.');
       }
     }
@@ -148,7 +148,7 @@ const respondWithMalOutput = function(message, result, searchString) {
         xml2js.parseString(body, function(err, xml) {
           const entry = xml.anime.entry[0];
 
-          console.log('MAL XML Search matched: ' + entry.title[0]);
+          log.info('MAL XML Search matched: ' + entry.title[0]);
 
           const embed = Utils.createEmbed(message, 'MyAnimeList.net');
 
@@ -173,7 +173,7 @@ const respondWithMalOutput = function(message, result, searchString) {
           message.channel.send('', { embed: embed });
         });
       } catch (e) {
-        console.warn('anime lookup failure (MAL)', e);
+        log.warn('anime lookup failure (MAL)', e);
       }
     }
   );

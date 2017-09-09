@@ -8,7 +8,7 @@ const handleMessage = function(bot, message, input) {
 
   const embed = Utils.createEmbed(message);
 
-  embed.setAuthor('Current DJs', bot.user.avatarURL);
+  embed.setAuthor('Current DJs', bot.user.avatarURL(256));
   const state = tt.getState(message.guild.id);
 
   if (state) {
@@ -16,7 +16,7 @@ const handleMessage = function(bot, message, input) {
       .then(votes => {
         db.all('SELECT id, points FROM User WHERE id IN (' + state.djs.map(function(i) { return i.id; }).join(',') + ')', [],
           function(err, result) {
-            if (err) console.log(err);
+            if (err) log.info(err);
 
             let description = '';
 

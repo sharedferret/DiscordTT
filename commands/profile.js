@@ -22,10 +22,10 @@ const displayProfile = function(bot, message, input) {
 const displayProfileForUser = function(bot, message, user) {
   const embed = Utils.createEmbed(message, null, true);
 
-  embed.setAuthor(user.username, user.avatarURL);
+  embed.setAuthor(user.username, user.avatarURL(256));
   embed.setTimestamp(new Date());
-  embed.setThumbnail(user.avatarURL);
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
+  embed.setThumbnail(user.avatarURL(512));
+  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL(256));
 
   userHandler.getProfile(user, message.guild ? message.guild.id : null, function(profile) {
     if (!profile || !profile.id) return message.reply('I couldn\'t find a profile for that user!');
@@ -133,7 +133,7 @@ const profileSetLocation = function(bot, message, input) {
     (err, response) => {
       if (err) {
         message.reply('I couldn\'t find that city.');
-        console.log('Geocode error', err);
+        log.info('Geocode error', err);
       }
 
       if (response.json.status == 'ZERO_RESULTS') {

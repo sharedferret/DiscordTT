@@ -4,8 +4,8 @@ const moment = require('moment');
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
   
-  embed.setAuthor(bot.user.username, bot.user.avatarURL);
-  embed.setThumbnail(bot.user.avatarURL);
+  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+  embed.setThumbnail(bot.user.avatarURL(256));
   embed.setDescription('Tohru is a Discord bot with an extensive list of commands, including server ' +
     'moderation and a music DJing feature based on Turntable.fm. Type ' +
     Utils.createCommandWithPrefix('help', message.guild ? message.guild.id : null) + ' to see the commands I support.');

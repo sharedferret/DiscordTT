@@ -66,7 +66,7 @@ const retrieveWeather = function(bot, message, input, metadata) {
         (err, response) => {
           if (err) {
             message.reply('I couldn\'t find that city.');
-            console.warn('Geocode error', err);
+            log.warn('Geocode error', err);
           }
 
           const metadata = {};
@@ -112,7 +112,7 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
   // If a US zip is requested, switch API call
   let apiUrl;
 
-  console.log('looking for ' + searchParameters);
+  log.info('looking for ' + searchParameters);
 
   if (/^\d{5}(-\d{4})?$/.test(searchParameters)) {
     apiUrl = 'http://api.openweathermap.org/data/2.5/weather?appid=' + config.api.openweathermap + '&zip=' + searchParameters
@@ -130,7 +130,7 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
       callback.apply(this, [err, body]);
     },
     (error, body) => {
-      if (error) return console.log(error);
+      if (error) return log.info(error);
 
       try {
         const weather = JSON.parse(body);
@@ -193,7 +193,7 @@ const retrieveWeather_DarkSky = function(bot, message, input, metadata) {
     },
     (err, res) => {
       if (err) {
-        console.warn('Error while retrieving Dark Sky response', err);
+        log.warn('Error while retrieving Dark Sky response', err);
         return message.reply('I couldn\'t get a forecast at this time.');
       }
 

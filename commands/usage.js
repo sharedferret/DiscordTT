@@ -4,12 +4,12 @@ const db = require(global.paths.lib + 'database-client').db;
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
   
-  embed.setAuthor(bot.user.username, bot.user.avatarURL);
+  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
 
   db.all('SELECT * FROM CommandUsage WHERE date = ? GROUP BY commandName ORDER BY count DESC LIMIT 5', 
     [ moment().utc().startOf('day').toDate() ],
     function(err, rows) {
-      if (err) return console.warn(err);
+      if (err) return log.warn(err);
 
       let description = '';
 

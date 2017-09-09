@@ -71,7 +71,7 @@ const handleMessage = function(bot, message, input) {
     },
     (err, body) => {
       if (err) {
-        console.warn(err);
+        log.warn(err);
         return message.reply('there was an error processing your request.');
       }
       try {

@@ -29,7 +29,7 @@ const handleMessage = function(bot, message, input) {
         (err, response) => {
           if (err) {
             message.reply('I couldn\'t find that city.');
-            console.log('Geocode error', err);
+            log.info('Geocode error', err);
           }
 
           if (response.json.status == 'ZERO_RESULTS') {
@@ -109,7 +109,7 @@ const retrieveForecast = function(bot, message, input, metadata) {
     },
     (err, res) => {
       if (err) {
-        console.warn('Error while retrieving Dark Sky response', err);
+        log.warn('Error while retrieving Dark Sky response', err);
         return message.reply('I couldn\'t get a forecast at this time.');
       }
 

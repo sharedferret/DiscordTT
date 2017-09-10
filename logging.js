@@ -6,7 +6,8 @@ global.log = new (winston.Logger)({
     new (winston.transports.Console)({
       level: 'debug',
       useConsole: true,
-      colorize: true
+      colorize: true,
+      stderrLevels: ['error']
     }),
     new (winston.transports.DailyRotateFile)({
       name: 'tohru',

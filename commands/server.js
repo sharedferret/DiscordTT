@@ -115,7 +115,7 @@ const handleMessage = function(bot, message, input) {
       if (settings && settings.logs && settings.logs.excludechannels && settings.logs.excludechannels[channel.id] !== undefined) {
         return false;
       }
-      return message.guild.me.permissionsIn(channel).has('READ_MESSAGE_HISTORY')
+      return message.guild.me.permissionsIn(channel).has('VIEW_CHANNEL')
     }).map(i => { return i.name; });
 
     let textChannelsText = textChannels.join(', ');

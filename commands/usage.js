@@ -4,7 +4,7 @@ const db = require(global.paths.lib + 'database-client').db;
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
   
-  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+  embed.setAuthor(bot.user.username, bot.user.avatarURL);
 
   db.all('SELECT * FROM CommandUsage WHERE date = ? GROUP BY commandName ORDER BY count DESC LIMIT 5', 
     [ moment().utc().startOf('day').toDate() ],

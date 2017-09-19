@@ -439,8 +439,8 @@ const displayGuildSettings = function(bot, message, input) {
   if (settings) {
     const embed = Utils.createEmbed(message);
 
-    embed.setAuthor('Server Settings', message.guild.iconURL(256));
-    embed.setThumbnail(message.guild.iconURL(256));
+    embed.setAuthor('Server Settings', message.guild.iconURL);
+    embed.setThumbnail(message.guild.iconURL);
 
     const guild = bot.guilds.get(guildId);
     embed.addField('Guild', (guild ? guild.name : 'Unknown Guild') + ' (ID: `' + guildId + '`)');

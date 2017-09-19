@@ -7,8 +7,8 @@ require('moment-precise-range-plugin');
 
 const handleMessage = function(bot, message, input) {
   const embed = Utils.createEmbed(message);
-  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
-  embed.setThumbnail(bot.user.avatarURL(256));
+  embed.setAuthor(bot.user.username, bot.user.avatarURL);
+  embed.setThumbnail(bot.user.avatarURL);
 
   let description = '';
 

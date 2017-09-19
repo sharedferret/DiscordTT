@@ -66,7 +66,7 @@ const handleMessage = function(bot, message, input) {
           },
           (error, response) => {
             const embed = Utils.createEmbed(message);
-            embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+            embed.setAuthor(bot.user.username, bot.user.avatarURL);
             embed.setTitle('Select a song to add');
 
             let description = '_Respond within 10 seconds with the number of the song to add to your queue._\n\n';

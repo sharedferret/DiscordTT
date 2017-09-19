@@ -1,6 +1,6 @@
 {
 	"name": "discord-tt",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Moderation and music bot for discord servers",
 	"main": "./app.js",
 	"repository": {
@@ -19,7 +19,7 @@
 		"assert": "^1.4.1",
 		"country-data": "0.0.31",
 		"dark-sky": "^1.0.10",
-		"discord.js": "git+https://github.com/hydrabolt/discord.js.git",
+		"discord.js": "^11.2.1",
 		"git-rev": "^0.2.1",
 		"googleapis": "^20.1.0",
 		"html-to-text": "^3.3.0",

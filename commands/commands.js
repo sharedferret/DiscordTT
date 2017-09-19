@@ -11,7 +11,7 @@ const handleMessage = function(bot, message, input) {
 const displayAllCommands = function(bot, message) {
   const embed = Utils.createEmbed(message);
 
-  embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+  embed.setAuthor(bot.user.username, bot.user.avatarURL);
   embed.setTitle('Supported Commands');
   embed.setDescription('Here\'s a list of all the commands I support. For more info, type ' +
     Utils.createCommandWithPrefix('help [command name]', message.guild ? message.guild.id : null) + '.');
@@ -34,7 +34,7 @@ const displayAllCommands = function(bot, message) {
       .join(', '));
   }
 
-  embed.setThumbnail(bot.user.avatarURL(256));
+  embed.setThumbnail(bot.user.avatarURL);
 
   message.channel.send('', { embed: embed });
 }
@@ -52,7 +52,7 @@ const displayCommandPage = function(bot, message, commandName) {
     const command = requestedCommand.command;
 
     const embed = Utils.createEmbed(message);
-    embed.setAuthor(bot.user.username, bot.user.avatarURL(256));
+    embed.setAuthor(bot.user.username, bot.user.avatarURL);
     embed.setTitle(command.info.name[0]);
     embed.setDescription('_' + (command.info.description ? command.info.description : 'No description available.') + '_');
     

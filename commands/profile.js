@@ -22,10 +22,10 @@ const displayProfile = function(bot, message, input) {
 const displayProfileForUser = function(bot, message, user) {
   const embed = Utils.createEmbed(message, null, true);
 
-  embed.setAuthor(user.username, user.avatarURL(256));
+  embed.setAuthor(user.username, user.avatarURL);
   embed.setTimestamp(new Date());
-  embed.setThumbnail(user.avatarURL(512));
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL(256));
+  embed.setThumbnail(user.avatarURL);
+  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
 
   userHandler.getProfile(user, message.guild ? message.guild.id : null, function(profile) {
     if (!profile || !profile.id) return message.reply('I couldn\'t find a profile for that user!');

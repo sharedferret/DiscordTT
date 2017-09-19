@@ -8,7 +8,7 @@ const handleMessage = function(bot, message, input) {
 
   const embed = Utils.createEmbed(message);
 
-  embed.setAuthor('Current DJs', bot.user.avatarURL(256));
+  embed.setAuthor('Current DJs', bot.user.avatarURL);
   const state = tt.getState(message.guild.id);
 
   if (state) {

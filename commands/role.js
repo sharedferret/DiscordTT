@@ -28,10 +28,10 @@ const listRoles = function(bot, message, input) {
 
   const embed = Utils.createEmbed(message);
 
-  embed.setAuthor('Autoroles', bot.user.avatarURL(256));
+  embed.setAuthor('Autoroles', bot.user.avatarURL);
   embed.setDescription(roleDescription);
   embed.addField('Available Roles', roleList.join('\n'));
-  embed.setThumbnail(message.guild.iconURL(256));
+  embed.setThumbnail(message.guild.iconURL);
 
   message.channel.send('', { embed: embed });
 };

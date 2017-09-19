@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('db.sqlite3');
 
 db.serialize(function() {
-  log.info('- Creating Song');
+  console.info('- Creating Song');
   db.run('CREATE TABLE IF NOT EXISTS Song (' +
     'id TEXT PRIMARY KEY NOT NULL,' +
     'type TEXT NOT NULL,' +
@@ -14,12 +14,12 @@ db.serialize(function() {
     'title TEXT NOT NULL,' +
     'metadata TEXT)');
 
-  log.info('- Creating Server');
+  console.info('- Creating Server');
   db.run('CREATE TABLE IF NOT EXISTS Server (' +
     'id TEXT PRIMARY KEY, ' +
     'settings TEXT)');
 
-  log.info('- Creating User');
+  console.info('- Creating User');
   db.run('CREATE TABLE IF NOT EXISTS User (' +
     'id TEXT PRIMARY KEY NOT NULL,' +
     'serverId TEXT NOT NULL, ' +
@@ -32,7 +32,7 @@ db.serialize(function() {
     'metadata TEXT, ' +
     'activePlaylistId TEXT)');
 
-  log.info('- Creating UserQueue');
+  console.info('- Creating UserQueue');
   db.run('CREATE TABLE IF NOT EXISTS UserQueue (' +
     'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
     'userId TEXT, ' +
@@ -41,7 +41,7 @@ db.serialize(function() {
     'dateAdded DATETIME,' +
     'playlistId TEXT)');
 
-  log.info('- Creating SongHistory');
+  console.info('- Creating SongHistory');
   db.run('CREATE TABLE IF NOT EXISTS SongHistory (' +
     'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
     'serverId TEXT NOT NULL, ' +
@@ -51,7 +51,7 @@ db.serialize(function() {
     'upvotes INTEGER DEFAULT 0, ' +
     'downvotes INTEGER DEFAULT 0)');
 
-  log.info('- Creating Playlist');
+  console.info('- Creating Playlist');
   db.run('CREATE TABLE IF NOT EXISTS Playlist (' +
     'id TEXT PRIMARY KEY, ' +
     'userId TEXT NOT NULL, ' +
@@ -59,7 +59,7 @@ db.serialize(function() {
     'metadata TEXT, ' +
     'UNIQUE(userId, name))');
 
-  log.info('- Creating UserPoints');
+  console.info('- Creating UserPoints');
   db.run('CREATE TABLE IF NOT EXISTS UserPoints(' +
     'userId TEXT PRIMARY KEY, '
     + 'chatMessage INTEGER NOT NULL DEFAULT 0, ' +
@@ -68,13 +68,21 @@ db.serialize(function() {
     'songVote INTEGER NOT NULL DEFAULT 0, ' +
     'songPointEarned INTEGER NOT NULL DEFAULT 0)');
   
-  log.info('- Creating CommandUsage');
+  console.info('- Creating CommandUsage');
   db.run('CREATE TABLE IF NOT EXISTS CommandUsage(' +
     'commandName TEXT NOT NULL, ' +
     'guildId TEXT NOT NULL, ' +
     'date DATETIME NOT NULL, ' +
     'count INTEGER NOT NULL DEFAULT 1, ' +
     'PRIMARY KEY(commandName, guildId, date))');
+
+  console.info('- Creating ImageCommand');
+  db.run('CREATE TABLE IF NOT EXISTS ImageCommand(' +
+    'id TEXT PRIMARY KEY, ' +
+    'guildId TEXT NOT NULL, ' +
+    'name TEXT NOT NULL, ' +
+    'url TEXT NOT NULL, ' +
+    'timestamp DATETIME)');
 });
 
 db.close();

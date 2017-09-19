@@ -12,6 +12,7 @@ const redisClient = require(global.paths.lib + 'redis-client');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const userHandler = require(global.paths.lib + 'user-handler');
 const guildLogger = require(global.paths.lib + 'guild-logging-handler');
+const imageHandler = require(global.paths.lib + 'image-handler');
 require(global.paths.lib + 'turntable-handler');
 
 bot.on('message', message => {
@@ -34,6 +35,7 @@ bot.on('ready', data => {
 
   // Load commands
   messageHandler.loadCommands();
+  imageHandler.loadImageCommandsFromDb();
 
   // Set game to welcome message
   bot.user.setPresence({ game: { name: '/help', type: 0 }});

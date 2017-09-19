@@ -12,10 +12,10 @@ const handleMessage = function(bot, message, input) {
 
   const guild = message.guild;
 
-  embed.setAuthor(guild.name, message.guild.iconURL(256));
+  embed.setAuthor(guild.name, message.guild.iconURL);
   embed.setTimestamp(new Date());
-  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL(256));
-  embed.setThumbnail(message.guild.iconURL(256));
+  embed.setFooter('Requested by ' + message.author.username, message.author.avatarURL);
+  embed.setThumbnail(message.guild.iconURL);
 
   embed.addField('Created By', guild.owner.nickname ? guild.owner.nickname : guild.owner.user.username, true);
   embed.addField('Created', moment(guild.createdTimestamp).format('dddd, MMMM Do YYYY'), true);

@@ -35,7 +35,7 @@ const handleMessage = function(bot, message, input) {
         description += `\n_Page ${page} of ${Math.ceil(songCount / 10)}_`;
 
         const embed = Utils.createEmbed(message);
-        embed.setAuthor(`Playlist: ${playlistName} (${songCount} song${songCount == 1 ? '' : 's'})`, message.author.avatarURL(256));
+        embed.setAuthor(`Playlist: ${playlistName} (${songCount} song${songCount == 1 ? '' : 's'})`, message.author.avatarURL);
         embed.setDescription(description);
 
         if (songs.length > 0) {

@@ -158,11 +158,11 @@ const retrieveForecast = function(bot, message, input, metadata) {
 
         weatherString += `${weatherIcon} ${dailyWeather.summary}\n`;
         weatherString += `High: ${dailyWeather.temperatureMax.toFixed(0)}${Utils.unitSymbols[units].temperature}, Low: ${dailyWeather.temperatureMin.toFixed(0)}${Utils.unitSymbols[units].temperature}\n`;
-        weatherString += `Wind: ${Utils.degreesToHeading(dailyWeather.windBearing)} ${dailyWeather.windSpeed.toFixed(0)} ${Utils.unitSymbols[units].speed}`;
-        if (dailyWeather.windGust && dailyWeather.windGust > 15) {
-          weatherString += ` (Gust ${dailyWeather.windGust.toFixed(0)} ${Utils.unitSymbols[units].speed})`;
-        }
-        weatherString += `\nSunrise: ${moment(dailyWeather.sunriseTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}, Sunset: ${moment(dailyWeather.sunsetTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}`;
+        // weatherString += `Wind: ${Utils.degreesToHeading(dailyWeather.windBearing)} ${dailyWeather.windSpeed.toFixed(0)} ${Utils.unitSymbols[units].speed}`;
+        // if (dailyWeather.windGust && dailyWeather.windGust > 15) {
+        //   weatherString += ` (Gust ${dailyWeather.windGust.toFixed(0)} ${Utils.unitSymbols[units].speed})`;
+        // }
+        weatherString += `Sunrise: ${moment(dailyWeather.sunriseTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}, Sunset: ${moment(dailyWeather.sunsetTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}`;
 
         embed.addField(day, weatherString);
       }

@@ -92,7 +92,7 @@ const handleWatch = (bot, message, input) => {
 
                 embed.addField('For Participant', donation.participantDisplayName);
                 embed.addField('Donor', donation.donorName ? donation.donorName : 'Anonymous', true);
-                embed.addField('Amount', '$' + donation.donationAmount.toFixed(2), true);
+                embed.addField('Amount', donation.donationAmount ? `$${donation.donationAmount.toFixed(2)}` : 'Undisclosed', true);
                 if (donation.message) embed.addField('Message', donation.message);
                 embed.setTimestamp(new Date(donation.timestamp));
 

@@ -2,8 +2,9 @@ const serverSettingsManager = require(global.paths.lib + 'server-settings-manage
 const request = require('request');
 const cacheManager = require(global.paths.lib + 'cache-manager');
 const extraLifeApi = require('extra-life-api');
+const Discord = require('discord.js');
 
-let watcher = null;
+const teams = {};
 
 const getTeamId = (message, input) => {
   let teamId = 0;
@@ -31,16 +32,16 @@ const showTeamData = (bot, message, input) => {
       embed.setTitle(data.name);
       embed.setDescription(`_Donate to this team here: https://www.extra-life.org/index.cfm?fuseaction=donorDrive.team&teamID=${teamId}_`);
       embed.setThumbnail(data.avatarImageURL);
-      embed.addField('Amount Raised', `$${data.totalRaisedAmount}`, true);
-      embed.addField('Fundraising Goal', `$${data.fundraisingGoal}`, true);
+      embed.addField('Amount Raised', `$${data.totalRaisedAmount.toFixed(2)}`, true);
+      embed.addField('Fundraising Goal', `$${data.fundraisingGoal.toFixed(2)}`, true);
 
       const teamCaptains = data.members.filter(i => { return i.isTeamCaptain === true; });
 
-      embed.addField(`Team Captain${teamCaptains.length > 1 ? 's' : ''}`, teamCaptains.map(i => { return `${i.displayName} - _Raised $${i.totalRaisedAmount}_`; }).join('\n'));
+      embed.addField(`Team Captain${teamCaptains.length > 1 ? 's' : ''}`, teamCaptains.map(i => { return `${i.displayName} - _Raised $${i.totalRaisedAmount.toFixed(2)}_`; }).join('\n'));
 
       const teamMembers = data.members.filter(i => { return i.isTeamCaptain !== true; });
 
-      embed.addField('Team Members', teamMembers.map(i => { return `${i.displayName} - _Raised $${i.totalRaisedAmount}_`; }).join('\n'));
+      embed.addField('Team Members', teamMembers.map(i => { return `${i.displayName} - _Raised $${i.totalRaisedAmount.toFixed(2)}_`; }).join('\n'));
 
       message.channel.send('', { embed: embed });
     })
@@ -52,12 +53,60 @@ const showDonationLink = (bot, message, input) => {
 };
 
 const handleWatch = (bot, message, input) => {
-  if (input.input === 'enable') {
-    watcher = setInterval(() => {
-      
-    })
-  } else if (input.input === 'disable') {
+  const serverSettings = serverSettingsManager.getSettings(message.guild.id);
+  if (serverSettings.extraLife && serverSettings.extraLife.teamId) {
+    teamId = parseInt(serverSettings.extraLife.teamId);
+  }
 
+  if (input.input === 'enable') {
+    console.log('enabling watcher')
+
+    if (!teams[teamId]) {
+      teams[teamId] = {};
+      teams[teamId].channel = message.channel;
+    }
+
+    if (!teams[teamId].watcher) {
+      teams[teamId].watcher = setInterval(() => {
+        extraLifeApi.getTeamDonations(teamId)
+          .then(data => {
+            if (!teams[teamId].donations) {
+              teams[teamId].donations = {};
+              for (const donation of data.recentDonations) {
+                const id = donation.donorName + ':' + donation.createdOn;
+                teams[teamId].donations[id] = donation;
+              }
+            }
+
+            for (const donation of data.recentDonations) {
+              const id = donation.donorName + ':' + donation.createdOn;
+              if (!teams[teamId].donations[id]) {
+                // Add donation
+                teams[teamId].donations[id] = donation;
+
+                // Send message
+                const embed = new Discord.RichEmbed();
+
+                embed.setTitle('New Donation');
+                embed.setThumbnail('http:' + donation.avatarImageURL);
+
+                embed.addField('For Participant', donation.participantDisplayName);
+                embed.addField('Donor', donation.donorName ? donation.donorName : 'Anonymous', true);
+                embed.addField('Amount', '$' + donation.donationAmount.toFixed(2), true);
+                if (donation.message) embed.addField('Message', donation.message);
+                embed.setTimestamp(new Date(donation.timestamp));
+
+                teams[teamId].channel.send('', { embed: embed });
+              }
+            }
+          })
+      }, 60000);
+    }
+  } else if (input.input === 'disable') {
+    console.log('disabling watcher');
+    clearInterval(teams[teamId].watcher);
+    teams[teamId].watcher = undefined;
+    teams[teamId].donations = undefined;
   }
 };
 

@@ -14,7 +14,7 @@ const handleMessage = (bot, message, input) => {
           message.channel.send('', { files: [ new Discord.Attachment(path, filename) ] })
         } else {
           // If not, send the URL as a response
-          message.reply(url);
+          message.channel.send(url);
         }
       } else {
         message.reply('no image found.');
@@ -26,11 +26,22 @@ const handleMessage = (bot, message, input) => {
 };
 
 const addImageCommand = (bot, message, input) => {
-  // not yet implemented
+  if (Utils.isGuildAdmin(message.member)) {
+    const cmd = input.input.split(' ');
+    const requestedCommand = cmd.shift();
+    const requestedUrl = cmd.join(' ');
+    imageHandler.addImageCommand(message, message.guild.id, message.author.id, requestedCommand, requestedUrl);
+  } else {
+    message.reply('you must be a guild administrator to use this command.');
+  }
 }
 
 const removeImageCommand = (bot, message, input) => {
-  // not yet implemented
+  if (Utils.isGuildAdmin(message.member)) {
+    imageHandler.removeImageCommand(message, message.guild.id, message.author.id, input.input);
+  } else {
+    message.reply('you must be a guild administrator to use this command.');
+  }
 }
 
 const removeImageFromCommand = (bot, message, input) => {

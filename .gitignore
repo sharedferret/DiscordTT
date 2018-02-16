@@ -1,4 +1,5 @@
 assets/
+backups/
 dev/
 config.json
 db.sqlite3

@@ -20,9 +20,5 @@ global.startTime = new Date();
 global.CommandType = require(global.paths.lib + 'commandtypes');
 global.Utils = require(global.paths.lib + 'utils');
 
-// Local cache for Google geocoding responses, better than nothing
-// TODO [#60]: Replace with redis
-global.locationCache = {};
-
 global.gitRev = '';
 git.short(rev => { if (rev) global.gitRev = rev; });

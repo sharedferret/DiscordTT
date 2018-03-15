@@ -1,6 +1,8 @@
 const request = require('request');
 const moment = require('moment');
 require('moment-timezone');
+const Canvas = require('canvas');
+const Discord = require('discord.js');
 const DarkSky = require('dark-sky');
 const forecast = new DarkSky(config.api.darksky);
 const countryData = require('country-data');
@@ -10,6 +12,7 @@ const tzlookup = require('tz-lookup');
 const serverSettingsManager = require(global.paths.lib + 'server-settings-manager');
 const RateLimiter = require(global.paths.lib + 'rate-limiter');
 const cacheManager = require(global.paths.lib + 'cache-manager');
+const icons = require(global.paths.lib + 'icons.json');
 
 const handleMessage = function(bot, message, input) {
   if (input.input) {
@@ -96,11 +99,13 @@ const retrieveWeather = function(bot, message, input, metadata) {
           metadata.location.formatted_address = result.formatted_address;
           metadata.location.timezone = tzlookup(result.geometry.location.lat, result.geometry.location.lng);
 
-          retrieveWeather_DarkSky(bot, message, input, metadata);
+          // retrieveWeather_DarkSky(bot, message, input, metadata);
+          retrieveWeather_DarkSky_Img(bot, message, input, metadata);
         }
       );
     } else {
-      retrieveWeather_DarkSky(bot, message, input, metadata);
+      // retrieveWeather_DarkSky(bot, message, input, metadata);
+      retrieveWeather_DarkSky_Img(bot, message, input, metadata);
     }
   } else {
     retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
@@ -163,6 +168,183 @@ const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) 
       }
     }
   );
+};
+
+const retrieveWeather_DarkSky_Img = (bot, message, input, metadata) => {
+  let units = 'auto';
+
+  if (input.flags && input.flags.units) {
+    if (input.flags.units == 'local') units = 'auto';
+    if (input.flags.units == 'us') units = 'us';
+    if (input.flags.units == 'uk') units = 'uk2';
+    if (input.flags.units == 'ca') units = 'ca';
+    if (input.flags.units == 'si') units = 'si';
+  }
+
+  cacheManager.makeCachedApiCall(
+    `DarkSky:${metadata.location.coordinates.latitude},${metadata.location.coordinates.longitude},${units}`,
+    900,
+    (callback) => {
+      forecast
+        .latitude(metadata.location.coordinates.latitude)
+        .longitude(metadata.location.coordinates.longitude)
+        .units(units)
+        .get()
+        .then(callback.bind(this, null))
+        .catch(callback)
+    },
+    (callback, err, res) => {
+      callback.apply(this, [err, res]);
+    },
+    (err, res) => {
+      request(`https://maps.googleapis.com/maps/api/staticmap?center=${metadata.location.coordinates.latitude},${metadata.location.coordinates.longitude}&zoom=7&size=110x110&maptype=roadmap&key=${config.api.google}`,
+        { encoding: null },
+        (gErr, gRes, gBody) => {
+          if (err) {
+            log.warn('Error while retrieving Dark Sky response', err);
+            return message.reply('I couldn\'t get a forecast at this time.');
+          }
+    
+          units = res.flags.units;
+    
+          // Initialize canvas
+
+          // TODO: Fix when we add forecasts
+          // const canvas = new Canvas(800, 500);
+          const canvas = new Canvas(800, 261);
+
+          const ctx = canvas.getContext('2d');
+          ctx.scale(1, 1);
+    
+          // Draw background
+          ctx.fillStyle = '#36393e';
+          ctx.fillRect(0, 0, 800, 500);
+    
+          // Calculate location string
+          const country = countryData.countries[metadata.location.country];
+          let locationString = '';
+    
+          if (metadata.location.components) {
+            const locationParts = [];
+    
+            if (metadata.location.components.locality) {
+              locationParts.push(metadata.location.components.locality);
+            } else if (metadata.location.components.postal_town) {
+              locationParts.push(metadata.location.components.postal_town);
+            }
+    
+            if (metadata.location.components.administrative_area_level_1) {
+              locationParts.push(metadata.location.components.administrative_area_level_1);
+            }
+    
+            locationString = locationParts.join(', ');
+
+            if (locationString == '') {
+              locationString = country.name;
+            }
+          }
+    
+          // Draw location string and flag
+          ctx.font = '27pt Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(locationString, 71, 41);
+          
+          const flagImg = new Canvas.Image;
+          flagImg.src = `${global.paths.root}/node_modules/svg-country-flags/png100px/${country.alpha2}.png`;
+          console.log(flagImg.src);
+          ctx.drawImage(flagImg, 10, 11, 48, 32);
+    
+          // Fill conditions section
+          ctx.fillStyle = '#32642e';
+          ctx.fillRect(0, 59, 800, 203);
+    
+          // Draw dividing lines
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 261, 800, 3);
+          ctx.fillRect(0, 58, 687, 3);
+          ctx.fillRect(687, 0, 3, 113);
+          ctx.fillRect(687, 110, 114, 3);
+          
+          const gMapImg = new Canvas.Image;
+          // console.log(`https://maps.googleapis.com/maps/api/staticmap?center=${metadata.location.coordinates.latitude},${metadata.location.coordinates.longitude}&zoom=7&size=110x110&maptype=roadmap&key=${config.api.google}`);
+          gMapImg.src = gBody;
+          ctx.drawImage(gMapImg, 690, 0, gMapImg.width, gMapImg.height);
+    
+          // Draw current temperature and weather
+          ctx.font = 'bold 75pt Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'right';
+          ctx.fillText(Math.round(res.currently.temperature), 237, 159);
+    
+          ctx.font = '32pt Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.fillText(Utils.unitSymbols[units].temperature, 232, 118);
+    
+          ctx.font = 'bold 36pt Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.fillText(res.currently.summary, 319, 143);
+    
+          // Draw extended weather info
+          ctx.font = 'italic 18pt Arial';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.fillText('Feels like', 23, 212);
+          ctx.fillText('Wind', 23, 241);
+          ctx.fillText('Humidity', 268, 212);
+          ctx.fillText('Pressure', 268, 241);
+          ctx.fillText('Visibility', 546, 212);
+          ctx.fillText('UV Index', 546, 241);
+    
+          ctx.font = '18pt Arial';
+          ctx.fillText(`${Math.round(res.currently.apparentTemperature)}${Utils.unitSymbols[units].temperature}`, 136, 212);
+          ctx.fillText(`${res.currently.windSpeed.toFixed(1)} ${Utils.unitSymbols[units].speed}`, 136, 241);
+          ctx.fillText(`${(res.currently.humidity * 100).toFixed(0)}%`, 380, 212);
+          
+          switch (units) {
+          case 'us':
+            ctx.fillText(`${Utils.hpaToInhg(res.currently.pressure).toFixed(2)} inHg`, 380, 241);
+            break;
+          case 'ca':
+            ctx.fillText(`${(res.currently.pressure / 10).toFixed(2)} kPa`, 380, 241);
+            break;
+          case 'uk2':
+            ctx.fillText(`${res.currently.pressure.toFixed(2)} mb`, 380, 241);
+            break;
+          case 'si':
+            ctx.fillText(`${res.currently.pressure.toFixed(2)} hPa`, 380, 241);
+            break;
+          default:
+            ctx.fillText('N/A', 380, 241);
+          }
+    
+          if (res.currently.visibility) {
+            ctx.fillText(`${res.currently.visibility} ${Utils.unitSymbols[units].distance}`, 656, 212);
+          } else {
+            ctx.fillText('N/A', 656, 212);
+          }
+    
+          if (res.currently.uvIndex) {
+            ctx.fillText(res.currently.uvIndex, 656, 241);
+          } else {
+            ctx.fillText('N/A', 656, 241);
+          }
+
+          // Draw current condition icon
+          const currentIcon = icons[res.currently.icon];
+          const currentImg = new Canvas.Image;
+          currentImg.src = new Buffer(currentIcon, 'base64');
+          ctx.drawImage(currentImg, 23, 82, currentImg.width, currentImg.height);
+    
+          // TODO: Forecast section
+          
+          // Convert to png and push response
+          const stream = canvas.pngStream();
+          message.channel.send('', new Discord.Attachment(stream));
+        }
+      );
+    });
 };
 
 const retrieveWeather_DarkSky = function(bot, message, input, metadata) {

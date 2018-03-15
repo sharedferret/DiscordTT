@@ -1,6 +1,7 @@
 assets/
 backups/
 dev/
+logs/
 config.json
 db.sqlite3
 db.sqlite3-journal

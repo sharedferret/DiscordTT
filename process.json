@@ -2,7 +2,7 @@
   "apps": [{
     "name": "Tohru",
     "script": "./app.js",
-    "watch": true,
+    "watch": false,
     "ignore_watch": ["db.sqlite3", "db.sqlite3-journal", "node_modules"],
     "restart_delay": 10000,
     "min_uptime": 5000,

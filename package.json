@@ -17,7 +17,7 @@
 	"dependencies": {
 		"@google/maps": "^0.4.3",
 		"assert": "^1.4.1",
-		"canvas": "^1.6.7",
+		"canvas-prebuilt": "^1.6.5-prerelease.1",
 		"country-data": "0.0.31",
 		"dark-sky": "^1.0.10",
 		"discord.js": "^11.2.1",

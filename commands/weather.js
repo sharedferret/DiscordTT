@@ -1,7 +1,7 @@
 const request = require('request');
 const moment = require('moment');
 require('moment-timezone');
-const Canvas = require('canvas');
+const Canvas = require('canvas-prebuilt');
 const Discord = require('discord.js');
 const DarkSky = require('dark-sky');
 const forecast = new DarkSky(config.api.darksky);
@@ -250,12 +250,12 @@ const retrieveWeather_DarkSky_Img = (bot, message, input, metadata) => {
           ctx.fillText(locationString, 71, 41);
           
           const flagImg = new Canvas.Image;
-          flagImg.src = `${global.paths.root}/node_modules/svg-country-flags/png100px/${country.alpha2}.png`;
-          console.log(flagImg.src);
+          flagImg.src = `${global.paths.root}/node_modules/svg-country-flags/png100px/${country.alpha2.toLowerCase()}.png`;
           ctx.drawImage(flagImg, 10, 11, 48, 32);
     
           // Fill conditions section
-          ctx.fillStyle = '#32642e';
+
+          ctx.fillStyle = Utils.getConditionFillColor(res.currently.temperature, units);
           ctx.fillRect(0, 59, 800, 203);
     
           // Draw dividing lines

@@ -210,8 +210,8 @@ const retrieveWeather_DarkSky_Img = (bot, message, input, metadata) => {
           // Initialize canvas
 
           // TODO: Fix when we add forecasts
-          // const canvas = new Canvas(800, 500);
-          const canvas = new Canvas(800, 261);
+          const canvas = new Canvas(800, 440);
+          // const canvas = new Canvas(800, 261);
 
           const ctx = canvas.getContext('2d');
           ctx.scale(1, 1);
@@ -337,7 +337,33 @@ const retrieveWeather_DarkSky_Img = (bot, message, input, metadata) => {
           currentImg.src = new Buffer(currentIcon, 'base64');
           ctx.drawImage(currentImg, 23, 82, currentImg.width, currentImg.height);
     
-          // TODO: Forecast section
+          // Forecast section
+          // 225 split
+          for (let i = 0; i < 3; i++) {
+            const dailyWeather = res.daily.data[i];
+            const dailyIcon = icons[dailyWeather.icon];
+            const dailyDateString = moment(dailyWeather.time * 1000).tz(res.timezone).format(Utils.unitSymbols[units].dateTiny);
+            
+            ctx.font = '18pt Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(dailyDateString, 178 + (225 * i), 301);
+
+            const dailyImg = new Canvas.Image;
+            dailyImg.src = new Buffer(dailyIcon, 'base64');
+            ctx.drawImage(dailyImg, 101 + (225 * i), 322, 60, 60);
+
+            ctx.font = 'bold 22pt Arial';
+            ctx.textAlign = 'right';
+
+            ctx.fillText(`${dailyWeather.temperatureMax.toFixed(0)}${Utils.unitSymbols[units].temperature}`, 250 + (225 * i), 347);
+            ctx.fillText(`${dailyWeather.temperatureMin.toFixed(0)}${Utils.unitSymbols[units].temperature}`, 250 + (225 * i), 382)
+            
+            // 13pt
+            ctx.font = 'italic 13pt Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Sunrise: ${moment(dailyWeather.sunriseTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}`, 178 + (225 * i), 411);
+            ctx.fillText(`Sunset: ${moment(dailyWeather.sunsetTime * 1000).tz(res.timezone).format(Utils.unitSymbols[units].time)}`, 178 + (225 * i), 434);
+          }
           
           // Convert to png and push response
           const stream = canvas.pngStream();

@@ -53,7 +53,7 @@ const retrieveWeather = function(bot, message, input, metadata) {
 
   // TODO: Quota management, fallback to OWM if DS quota reached
   // TODO: Shared code with forecast.js
-  if (source == 'DarkSky') {
+  // if (source == 'DarkSky') {
     if (!metadata) {
       cacheManager.makeCachedApiCall(
         `Geocode:${searchParameters}`,
@@ -107,9 +107,9 @@ const retrieveWeather = function(bot, message, input, metadata) {
       // retrieveWeather_DarkSky(bot, message, input, metadata);
       retrieveWeather_DarkSky_Img(bot, message, input, metadata);
     }
-  } else {
-    retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
-  }
+  // } else {
+  //   retrieveWeather_OpenWeatherMap(bot, message, searchParameters);
+  // }
 };
 
 const retrieveWeather_OpenWeatherMap = function(bot, message, searchParameters) {

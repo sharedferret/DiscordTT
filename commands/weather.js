@@ -274,12 +274,12 @@ const retrieveWeather_DarkSky_Img = (bot, message, input, metadata) => {
           ctx.font = 'bold 75pt Arial';
           ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'right';
-          ctx.fillText(Math.round(res.currently.temperature), 237, 159);
+          ctx.fillText(Math.round(res.currently.temperature), 257, 159);
     
           ctx.font = '32pt Arial';
           ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'left';
-          ctx.fillText(Utils.unitSymbols[units].temperature, 232, 118);
+          ctx.fillText(Utils.unitSymbols[units].temperature, 252, 118);
     
           ctx.font = 'bold 36pt Arial';
           ctx.fillStyle = '#ffffff';

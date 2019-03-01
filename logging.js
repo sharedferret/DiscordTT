@@ -20,12 +20,12 @@ global.log = new (winston.Logger)({
         let requestId = '';
         let origin = '';
 
-        if (options.meta.requestId) {
+        if (options.meta && options.meta.requestId) {
           requestId = options.meta.requestId;
           delete options.meta.requestId;
         }
 
-        if (options.meta.origin) {
+        if (options.meta && options.meta.origin) {
           origin = options.meta.origin;
           delete options.meta.origin;
         }
